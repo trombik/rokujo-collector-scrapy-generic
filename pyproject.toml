@@ -1,0 +1,12 @@
+[project]
+name = "rokujo-collector-scrapy"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pproxy>=2.7.9",
+    "pytest-mock>=3.15.1",
+    "scrapy>=2.14.0",
+    "trafilatura[all]>=2.0.0",
+]

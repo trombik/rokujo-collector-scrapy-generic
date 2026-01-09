@@ -10,3 +10,10 @@ dependencies = [
     "scrapy>=2.14.0",
     "trafilatura[all]>=2.0.0",
 ]
+
+[tool.ruff]
+line-length = 79
+
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]

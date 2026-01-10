@@ -44,44 +44,9 @@ def extract_article(res: Response, lang: str = "ja") -> dict:
 
 def extract_item(response: Response, extracted: dict) -> ArticleItem:
     """
-    Build ArticleItem from Response and a dict of article returned by
-    extract_article().
+    Build ArticleItem from Response
     """
-    from datetime import datetime, timezone
-
-    now = datetime.now(timezone.utc)
-    title = extracted.get("title", None)
-    author = extracted.get("author", None)
-    extracted_date = extracted.get("date", None)
-    extracted_date = extracted_date if extracted_date == "" else None
-    text = extracted.get("text", None)
-    extracted_time = (
-        datetime.fromisoformat(extracted_date) if extracted_date else None
-    )
-
-    site_name = get_meta_property(response, "og:site_name")
-    description = get_meta_property(response, "og:description")
-    kind = get_meta_property(response, "og:type")
-    published_time = (
-        get_meta_property(response, "article:published_time") or extracted_time
-    )
-    modified_time = (
-        get_meta_property(response, "article:modified_time") or published_time
-    )
-
-    item = ArticleItem(
-        kind=kind,
-        site_name=site_name,
-        description=description,
-        title=title,
-        author=author,
-        uri=response.url,
-        created_at=published_time,
-        updated_at=modified_time,
-        acquired_at=now,
-        text=text,
-    )
-    return item
+    return ArticleItem.from_response(response)
 
 
 def idn2ascii(url_str: str) -> str:

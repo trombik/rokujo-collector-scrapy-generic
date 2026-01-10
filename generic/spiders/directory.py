@@ -6,7 +6,8 @@ import scrapy
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import Rule
 
-from generic.utils import extract_article, extract_item, idn2ascii
+from generic.utils import idn2ascii
+from generic.items import ArticleItem
 
 
 class DirectorySpider(scrapy.spiders.CrawlSpider):
@@ -42,9 +43,7 @@ class DirectorySpider(scrapy.spiders.CrawlSpider):
     }
 
     def parse_body(self, response):
-        article = extract_article(response)
-        item = extract_item(response, article)
-        return item
+        return ArticleItem.from_response(response)
 
     def __init__(self, url=None, *args, **kwargs):
         self.start_urls = [idn2ascii(url)]

@@ -23,7 +23,7 @@ class DropMissingTextPipeline:
 
     def process_item(self, item):
         adapter = ItemAdapter(item)
-        text = adapter.get("text")
+        text = adapter.get("body")
         if text is None or text == "":
             raise DropItem("Missing text")
         return item
@@ -35,7 +35,7 @@ class DateStringConverterPipeline:
     """
 
     def process_item(self, item, spider):
-        keys = {"created_at", "updated_at", "acquired_at"}
+        keys = {"published_time", "acquired_time", "modified_time"}
         adapter = ItemAdapter(item)
         for key in keys:
             value = adapter.get(key)

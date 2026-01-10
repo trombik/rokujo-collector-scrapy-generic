@@ -49,6 +49,8 @@ DOWNLOAD_DELAY = 1
 
 DOWNLOADER_MIDDLEWARES = {
     "scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware": 543,
+    "scrapy.downloadermiddlewares.useragent.UserAgentMiddleware": None,
+    "scrapy_user_agents.middlewares.RandomUserAgentMiddleware": 400
 }
 
 # Enable or disable extensions

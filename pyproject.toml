@@ -9,6 +9,7 @@ dependencies = [
     "pproxy>=2.7.9",
     "pytest-mock>=3.15.1",
     "scrapy>=2.14.0",
+    "scrapy-user-agents>=0.1.1",
     "trafilatura[all]>=2.0.0",
 ]
 

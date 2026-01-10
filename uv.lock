@@ -1096,6 +1096,7 @@ dependencies = [
     { name = "pproxy" },
     { name = "pytest-mock" },
     { name = "scrapy" },
+    { name = "scrapy-user-agents" },
     { name = "trafilatura", extra = ["all"] },
 ]
 
@@ -1105,6 +1106,7 @@ requires-dist = [
     { name = "pproxy", specifier = ">=2.7.9" },
     { name = "pytest-mock", specifier = ">=3.15.1" },
     { name = "scrapy", specifier = ">=2.14.0" },
+    { name = "scrapy-user-agents", specifier = ">=0.1.1" },
     { name = "trafilatura", extras = ["all"], specifier = ">=2.0.0" },
 ]
 
@@ -1135,6 +1137,17 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/03/05/db301a334044577e2f341b19631229aae06f4664dc4c6c3c6246b4081872/scrapy-2.14.0.tar.gz", hash = "sha256:5df8326d9bffc90a719c4579b80195fc0b3c85a0503c73e0f75a5c582da4c064", size = 1251119, upload-time = "2026-01-05T10:07:20.247Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1e/df/de19380166194b9b88e452b7f3074c160be3884531a718ada7ee1cf7e24d/scrapy-2.14.0-py3-none-any.whl", hash = "sha256:7914d52dfa6d336ce72ffb57631d8843c556ea9f957352df135defdbdaa351a8", size = 331451, upload-time = "2026-01-05T10:07:18.053Z" },
+]
+
+[[package]]
+name = "scrapy-user-agents"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "user-agents" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/50/1f/58a58f465f6d3c75b6cca0e470613349504b8c69f3f3963c898ebabdfa21/scrapy_user_agents-0.1.1-py2.py3-none-any.whl", hash = "sha256:284c9af555f3128697a2953ab3cdb987b160b091a12896562d969cf9e81d1350", size = 27913, upload-time = "2018-10-23T23:33:41.289Z" },
 ]
 
 [[package]]
@@ -1263,6 +1276,26 @@ wheels = [
 ]
 
 [[package]]
+name = "ua-parser"
+version = "1.0.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "ua-parser-builtins" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/70/0e/ed98be735bc89d5040e0c60f5620d0b8c04e9e7da99ed1459e8050e90a77/ua_parser-1.0.1.tar.gz", hash = "sha256:f9d92bf19d4329019cef91707aecc23c6d65143ad7e29a233f0580fb0d15547d", size = 728106, upload-time = "2025-02-01T14:13:32.508Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/94/37/be6dfbfa45719aa82c008fb4772cfe5c46db765a2ca4b6f524a1fdfee4d7/ua_parser-1.0.1-py3-none-any.whl", hash = "sha256:b059f2cb0935addea7e551251cbbf42e9a8872f86134163bc1a4f79e0945ffea", size = 31410, upload-time = "2025-02-01T14:13:28.458Z" },
+]
+
+[[package]]
+name = "ua-parser-builtins"
+version = "202601"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fd/82/aab481e2fc6dee0a13ce35c750e97dbe3f270fb327089c99a8f5e6900e0c/ua_parser_builtins-202601-py3-none-any.whl", hash = "sha256:f5dc93b0f53724dcd5c3eb79edb0aea281cb304a2c02a9436cbeb8cfb8bc4ad1", size = 89228, upload-time = "2026-01-02T08:58:23.453Z" },
+]
+
+[[package]]
 name = "urllib3"
 version = "2.6.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1278,6 +1311,18 @@ brotli = [
 ]
 socks = [
     { name = "pysocks" },
+]
+
+[[package]]
+name = "user-agents"
+version = "2.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "ua-parser" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e3/e1/63c5bfb485a945010c8cbc7a52f85573561737648d36b30394248730a7bc/user-agents-2.2.0.tar.gz", hash = "sha256:d36d25178db65308d1458c5fa4ab39c9b2619377010130329f3955e7626ead26", size = 9525, upload-time = "2020-08-23T06:01:56.382Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8f/1c/20bb3d7b2bad56d881e3704131ddedbb16eb787101306887dff349064662/user_agents-2.2.0-py3-none-any.whl", hash = "sha256:a98c4dc72ecbc64812c4534108806fb0a0b3a11ec3fd1eafe807cee5b0a942e7", size = 9614, upload-time = "2020-08-23T06:01:54.047Z" },
 ]
 
 [[package]]

@@ -10,4 +10,5 @@ wheels/
 .venv
 
 # cache directory
-.scrapy/
+/.scrapy/
+/tmp/

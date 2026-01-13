@@ -41,8 +41,6 @@ class WithSourceSpider(Args[MyParams], scrapy.Spider):
     allowed_domains = []
     start_urls = []
 
-    custom_settings = {"ROBOTSTXT_OBEY": False}
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # parse urls argument

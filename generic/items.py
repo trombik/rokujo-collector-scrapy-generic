@@ -12,7 +12,7 @@ from scrapy.http import Response
 from scrapy.selector import Selector
 from trafilatura import extract
 
-from generic.utils import get_metadata
+from generic.utils import count_xml_character, get_metadata
 
 
 @dataclass
@@ -52,6 +52,8 @@ class ArticleItem:
     """ The title of the webpage. """
     item_type: str = field(init=False)
     """ The class name of the item. Automatically set in __post_init__."""
+    character_count: int = 0
+    """ The number of characters in the article."""
 
     def __post_init__(self):
         self.item_type = self.__class__.__name__
@@ -110,6 +112,7 @@ class ArticleItem:
                     f"URL: {res.url}"
                 )
             )
+        character_count = count_xml_character(body)
 
         return cls(
             url=metadata["url"],
@@ -117,6 +120,7 @@ class ArticleItem:
             lang=metadata["lang"],
             author=metadata["author"],
             body=body,
+            character_count=character_count,
             kind=metadata["kind"],
             site_name=metadata["site_name"],
             description=metadata["description"],

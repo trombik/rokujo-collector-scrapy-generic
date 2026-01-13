@@ -120,30 +120,19 @@ def get_metadata(res: Response) -> dict:
             or ld.get("headline")
             or res.xpath("//title/text()").get()
         ),
-        "lang": (
-            locale_to_lang(res.xpath("/html/@lang").get())
-            or None
-        ),
-        "site_name": (
-            og.get("og:site_name")
-            or dig(ld, "publisher", "name")
-        ),
-        "kind": (
-            og.get("og:type")
-            or ld.get("@type")
-        ),
+        "lang": (locale_to_lang(res.xpath("/html/@lang").get()) or None),
+        "site_name": (og.get("og:site_name") or dig(ld, "publisher", "name")),
+        "kind": (og.get("og:type") or ld.get("@type")),
         "author": (
             og.get("og:author")
             or dig(ld, "author", "name")
             or dig(ld, "author", 0, "name")
         ),
         "modified_time": str_to_isoformat(
-            og.get("article:modified_time")
-            or ld.get("dateModified")
+            og.get("article:modified_time") or ld.get("dateModified")
         ),
         "published_time": str_to_isoformat(
-            og.get("article:published_time")
-            or ld.get("datePublished")
+            og.get("article:published_time") or ld.get("datePublished")
         ),
         "description": (
             og.get("og:description").strip()
@@ -151,3 +140,18 @@ def get_metadata(res: Response) -> dict:
             or None
         ),
     }
+
+
+def count_xml_character(xml_string: str) -> int:
+    """
+    Count characters in XML string, excluding spaces (not words).
+    """
+    import re
+
+    from scrapy import Selector
+
+    sel = Selector(text=xml_string, type="xml")
+    texts = sel.xpath("//text()").getall()
+    full_text = "".join(texts)
+    clean_text = re.sub(r"\s+", "", full_text)
+    return len(clean_text)

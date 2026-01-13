@@ -4,9 +4,9 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Self
 
 from scrapy.http import Response
 from scrapy.selector import Selector
@@ -26,6 +26,14 @@ class ArticleItem:
     url: str
     """ The URL of the webpage. """
 
+    lang: str
+    """
+    The two letter language code of the article. When the language is
+    undetermined, "und" is returned.
+
+    See also: ISO 639-1:2002; Part 1: Alpha-2 code (JIS X 0412-1:2004)
+    """
+
     author: Optional[str] = None
     """ The author of the webpage. """
     description: Optional[str] = None
@@ -42,6 +50,11 @@ class ArticleItem:
     """ The name of the website. """
     title: Optional[str] = None
     """ The title of the webpage. """
+    item_type: str = field(init=False)
+    """ The class name of the item. Automatically set in __post_init__."""
+
+    def __post_init__(self):
+        self.item_type = self.__class__.__name__
 
     @staticmethod
     def get_json_ld(res: Response) -> Dict[str, Any]:
@@ -59,7 +72,19 @@ class ArticleItem:
             return {}
 
     @classmethod
-    def from_response(cls, res: Response, lang: str = "ja"):
+    def from_response(cls, res: Response, lang: str = None) -> Self:
+        """
+        Create an ArticleItem from a scrapy.http.Response.
+
+        Args:
+            res: scrapy.http.Response.
+            lang: The language of the Response. When None, the language is
+                guessed from the content.
+
+        Returns:
+            Self: An instance of ArticleItem or its subclass.
+        """
+
         def get_meta_property(name: str) -> str:
             """
             Extracts a meta property content from a response.
@@ -88,6 +113,7 @@ class ArticleItem:
         acquired_time = datetime.now(timezone.utc)
         xml_sel = Selector(text=extracted)
         x_title = xml_sel.xpath("//doc/@title").get()
+        x_lang = xml_sel.xpath("//doc/@language").get() or "und"
         x_author = xml_sel.xpath("//doc/@author").get()
         x_description = xml_sel.xpath("//doc/@description").get()
         x_fingerprint = xml_sel.xpath("//doc/@fingerprint").get()
@@ -125,6 +151,7 @@ class ArticleItem:
         return cls(
             url=res.url,
             title=x_title,
+            lang=x_lang,
             author=x_author or ld_author,
             fingerprint=x_fingerprint,
             body=x_body,
@@ -139,3 +166,13 @@ class ArticleItem:
                 "article:modified_time"
             ) or ld_modified_time,
         )
+
+
+@dataclass
+class ArticleWithSourceItem(ArticleItem):
+    """
+    An ArticleItem that includes a list of related ArticleItems as sources.
+    """
+
+    sources: List[ArticleItem] = field(default_factory=list)
+    """ A list of sources. """

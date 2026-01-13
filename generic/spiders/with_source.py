@@ -16,12 +16,6 @@ class MyParams(BaseModel):
     text: str = "英語記事"
     """ A text that indicates source articles"""
 
-    lang: str = "ja"
-    """ The language of the article. """
-
-    src_lang: str = "en"
-    """ The language of source articles. """
-
 
 class WithSourceSpider(Args[MyParams], scrapy.Spider):
     """
@@ -63,9 +57,7 @@ class WithSourceSpider(Args[MyParams], scrapy.Spider):
             ArticleWithSourceItem
 
         """
-        item = ArticleWithSourceItem.from_response(
-            response, lang=self.args.lang
-        )
+        item = ArticleWithSourceItem.from_response(response)
 
         # exract a list of href, using a query.
         query = (
@@ -125,7 +117,7 @@ class WithSourceSpider(Args[MyParams], scrapy.Spider):
         """
 
         # res is a source article. create an ArticleItem.
-        source_item = ArticleItem.from_response(res, lang=self.args.src_lang)
+        source_item = ArticleItem.from_response(res)
 
         # append the source article to the parent item.
         parent_item.sources.append(source_item)

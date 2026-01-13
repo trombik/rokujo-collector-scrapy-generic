@@ -59,10 +59,12 @@ class ReadMoreSpider(Args[MyParams], scrapy.Spider):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        domains = []
         for url in self.args.urls.split(","):
-            domain = urlparse(idn2ascii(url)).netloc
-            self.allowed_domains.append(domain)
-            self.logger.debug(f"allowed_domains: {self.allowed_domains}")
+            domains.append(urlparse(idn2ascii(url)).netloc)
+        unique_domains = list(set(domains))
+        self.allowed_domains.extend(unique_domains)
+        self.logger.debug(f"allowed_domains: {self.allowed_domains}")
 
     async def start(self):
         for url in self.args.urls.split(","):

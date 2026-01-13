@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Self
 
+from dateutil import parser
 from scrapy.http import Response
 from scrapy.selector import Selector
 from trafilatura import extract
@@ -58,7 +59,7 @@ class ArticleItem:
 
     @staticmethod
     def get_json_ld(res: Response) -> Dict[str, Any]:
-        """ Extracts and parses JSON-LD from the response. """
+        """Extracts and parses JSON-LD from the response."""
         raw_json = res.xpath(
             '//script[@type="application/ld+json"]/text()'
         ).get()
@@ -95,6 +96,19 @@ class ArticleItem:
             path = f"//meta[@property='{name}']/@content"
             return res.xpath(path).get()
 
+        def get_meta_name(name: str) -> str:
+            query = f"//meta[@name='{name}']/@content"
+            return res.xpath(query).get()
+
+        def str_to_isoformat(string: str):
+            if str is None:
+                return None
+            try:
+                dt = parser.parse(string)
+                return dt.isoformat()
+            except (ValueError, TypeError, OverflowError):
+                return None
+
         extracted = extract(
             res.text,
             url=res.url,
@@ -110,7 +124,7 @@ class ArticleItem:
                 f"URL: {res.url}\n"
             )
 
-        acquired_time = datetime.now(timezone.utc)
+        acquired_time = datetime.now(timezone.utc).isoformat()
         xml_sel = Selector(text=extracted)
         x_title = xml_sel.xpath("//doc/@title").get()
         x_lang = xml_sel.xpath("//doc/@language").get() or "und"
@@ -148,23 +162,36 @@ class ArticleItem:
             case _:
                 ld_modified_time = None
 
+        published_time = str_to_isoformat(
+            (get_meta_property("article:published_time"))
+            or (get_meta_name("article:published_time"))
+            or (ld_published_time)
+        )
+        modified_time = str_to_isoformat(
+            (get_meta_property("article:modified_time"))
+            or (get_meta_name("article:modified_time"))
+            or (ld_modified_time)
+        )
+        author = (
+            (x_author)
+            or (get_meta_name("article:author"))
+            or (get_meta_property("article:author"))
+            or (ld_author)
+        )
+
         return cls(
             url=res.url,
             title=x_title,
             lang=x_lang,
-            author=x_author or ld_author,
+            author=author,
             fingerprint=x_fingerprint,
             body=x_body,
             kind=get_meta_property("og:type"),
             site_name=x_site_name or get_meta_property("og:site_name"),
             description=x_description or get_meta_property("og:description"),
             acquired_time=acquired_time,
-            published_time=get_meta_property(
-                "article:published_time"
-            ) or ld_published_time,
-            modified_time=get_meta_property(
-                "article:modified_time"
-            ) or ld_modified_time,
+            published_time=published_time,
+            modified_time=modified_time,
         )
 
 

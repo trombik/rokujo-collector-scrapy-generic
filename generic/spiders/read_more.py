@@ -12,6 +12,7 @@ from generic.utils import idn2ascii
 class MyParams(BaseModel):
     urls: str
     read_more: str = "記事全文を読む"
+    read_more_xpath: str = None
     read_next: str = "次へ"
 
 
@@ -50,6 +51,38 @@ class ReadMoreSpider(Args[MyParams], scrapy.Spider):
         urls: Comma-separated string of summary page URLs. Mandatory.
         read_more: Text string of the <a> tag that links to the main article.
                    Default is "記事全文を読む".
+
+        read_more_xpath:
+            XPath query that matches <a> tag. '/@href' is automatically
+            appended to the query.
+
+            When `read_more_xpath` is not None, `read_more` is ignored.
+
+            When the query matches multiple elements, the first one will be
+            used.
+
+            Default is None.
+
+            An example:
+
+            ```text
+               //h3[contains(text(), "関連記事")]/following-sibling::ul[1]/li/a
+            ```
+
+            1. `//h3`
+                * "Look everywhere": Search the entire document for any Level
+                    3 Heading (<h3>).
+            2. `[contains(text(), "関連記事")]`
+                * "Filter by text": Out of all those headings, only keep the
+                ones that contain the text "関連記事" (Related Articles).
+            3. `/following-sibling::ul[1]`
+                * "Find the next list": Look at the elements on the same level
+                (siblings) immediately after that heading, and pick the first
+                Unordered List (<ul>) you see.
+            4. `/li/a`
+                * "Go inside the list items": Navigate into each list item
+                (<li>) and then into the link tag (<a>) found inside it.
+
         read_next: Text string of the <a> tag that links to the next page.
                    Default is "次へ".
     """
@@ -77,11 +110,18 @@ class ReadMoreSpider(Args[MyParams], scrapy.Spider):
         Yields:
             Request to the main article.
         """
-
-        self.logger.debug(f"Searching read_more with: {self.args.read_more}")
-        href = res.xpath(
-            "//a[text()=$text]/@href", text=self.args.read_more
-        ).get()
+        if self.args.read_more_xpath:
+            self.logger.debug(
+                f"Searching read_more_xpath with: {self.args.read_more_xpath}"
+            )
+            href = res.xpath(f"{self.args.read_more_xpath}/@href").get()
+        else:
+            self.logger.debug(
+                f"Searching read_more with: {self.args.read_more}"
+            )
+            href = res.xpath(
+                "//a[text()=$text]/@href", text=self.args.read_more
+            ).get()
         if href:
             target_url = res.urljoin(href)
             self.logger.debug(f"Read more link is found. Parsing {target_url}")
@@ -93,8 +133,8 @@ class ReadMoreSpider(Args[MyParams], scrapy.Spider):
             yield from self.parse_article(res)
 
     def parse_article(
-            self, res: scrapy.http.Response,
-            item: ArticleItem = None):
+        self, res: scrapy.http.Response, item: ArticleItem = None
+    ):
         """
         Parse the main article.
 

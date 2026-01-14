@@ -85,8 +85,13 @@ def get_metadata(res: Response) -> dict:
     Returns: dict
     """
     data = get_uniform_metadata(res.text, res.url)
-    og = data.get("opengraph", [{}])[0]
-    ld_raw = data.get("json-ld", [{}])[0]
+
+    og_list = data.get("opengraph", [])
+    og = og_list[0] if og_list else {}
+
+    ld_raw_list = data.get("json-ld", [])
+    ld_raw = ld_raw_list[0] if ld_raw_list else {}
+
     ld = (
         ld_raw.get("@graph", [ld_raw])[0]
         if isinstance(ld_raw.get("@graph"), list)
@@ -135,8 +140,8 @@ def get_metadata(res: Response) -> dict:
             og.get("article:published_time") or ld.get("datePublished")
         ),
         "description": (
-            og.get("og:description").strip()
-            or (ld.get("description") or "").strip()
+            og.get("og:description")
+            or (ld.get("description") or "")
             or None
         ),
     }

@@ -6,8 +6,8 @@ import scrapy
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import Rule
 
-from generic.utils import idn2ascii
 from generic.items import ArticleItem
+from generic.utils import idn2ascii
 
 
 class DirectorySpider(scrapy.spiders.CrawlSpider):
@@ -43,7 +43,7 @@ class DirectorySpider(scrapy.spiders.CrawlSpider):
     }
 
     def parse_body(self, response):
-        return ArticleItem.from_response(response)
+        yield ArticleItem.from_response(response)
 
     def __init__(self, url=None, *args, **kwargs):
         self.start_urls = [idn2ascii(url)]
@@ -64,9 +64,13 @@ class DirectorySpider(scrapy.spiders.CrawlSpider):
         regex = rf"^https?://{re.escape(parsed.netloc)}{re.escape(path)}.*"
         self.rules = (
             Rule(
-                LinkExtractor(allow=[regex]),
+                LinkExtractor(allow=[regex], deny=(r"\.(pdf|docx)")),
                 callback="parse_body",
                 follow=True,
             ),
+            Rule(
+                LinkExtractor(deny=(r".*")),
+            ),
         )
         super(DirectorySpider, self).__init__(*args, **kwargs)
+        self._compile_rules()

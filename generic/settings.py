@@ -24,7 +24,7 @@ ROBOTSTXT_OBEY = False
 # Concurrency and throttling settings
 # CONCURRENT_REQUESTS = 16
 CONCURRENT_REQUESTS_PER_DOMAIN = 1
-DOWNLOAD_DELAY = 1
+DOWNLOAD_DELAY = 3
 
 # Disable cookies (enabled by default)
 # COOKIES_ENABLED = False
@@ -50,7 +50,7 @@ DOWNLOAD_DELAY = 1
 DOWNLOADER_MIDDLEWARES = {
     "scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware": 543,
     "scrapy.downloadermiddlewares.useragent.UserAgentMiddleware": None,
-    "scrapy_user_agents.middlewares.RandomUserAgentMiddleware": 400
+    "scrapy_user_agents.middlewares.RandomUserAgentMiddleware": 400,
 }
 
 # Enable or disable extensions

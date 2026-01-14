@@ -97,14 +97,10 @@ class WithSourceSpider(Args[MyParams], scrapy.Spider):
         item = ArticleWithSourceItem.from_response(response)
 
         if self.args.contains_text:
-            query = (
-                "//main//a[contains(., $arg)]/@href"
-            )
+            query = "//main//a[contains(., $arg)]/@href"
             arg = self.args.contains_text
         elif self.args.parent_contains_text:
-            query = (
-                "//main//a[contains(parent::*, $arg)]/@href"
-            )
+            query = "//main//a[contains(parent::*, $arg)]/@href"
             arg = self.args.parent_contains_text
         else:
             ValueError(
@@ -113,10 +109,7 @@ class WithSourceSpider(Args[MyParams], scrapy.Spider):
             )
 
         self.logger.debug(f"query: {query}\narg: {arg}\n")
-        source_hrefs = response.xpath(
-            query,
-            arg=arg
-        ).getall()
+        source_hrefs = response.xpath(query, arg=arg).getall()
 
         # ensure URLs are absolute.
         source_urls = [response.urljoin(href) for href in source_hrefs]

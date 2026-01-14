@@ -140,9 +140,7 @@ def get_metadata(res: Response) -> dict:
             og.get("article:published_time") or ld.get("datePublished")
         ),
         "description": (
-            og.get("og:description")
-            or (ld.get("description") or "")
-            or None
+            og.get("og:description") or (ld.get("description") or "") or None
         ),
     }
 

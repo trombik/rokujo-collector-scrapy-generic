@@ -13,8 +13,38 @@ class MyParams(BaseModel):
     urls: str
     """ Comma separated list of URLs."""
 
-    text: str = "英語記事"
-    """ A text that indicates source articles"""
+    parent_contains_text: str = None
+    """
+        Matches <a> tag whose parent contains `parent_contains_text`.
+
+        An example:
+
+        When `parent_contains_text` is `英語記事`, the spider picks all the
+        following <a> tags.
+
+        ```html
+        <main>
+            <p>英語記事: <a href="#">foo</a> / <a href="#">bar</a></p>
+        </main>
+        ```
+    """
+
+    contains_text: str = None
+    """
+        Matches <a> tag, whose text contains `contains_text`.
+
+        An example:
+
+        When `contains_text` is `US版`, the spider picks all the following <a>
+        tags.
+
+        ```html
+        <main>
+            <a>US版</a>
+            <p><a>US版</a></a>
+        </main>
+        ```
+    """
 
 
 class WithSourceSpider(Args[MyParams], scrapy.Spider):
@@ -23,6 +53,8 @@ class WithSourceSpider(Args[MyParams], scrapy.Spider):
 
     The spider crawls given URLs and scrapes the article and source articles
     if it finds them.
+
+    The spider assumes that articles are a child of `<main>`.
 
     Args:
         urls: Comma-separated string of summary page URLs. Mandatory.
@@ -42,6 +74,11 @@ class WithSourceSpider(Args[MyParams], scrapy.Spider):
             domain = urlparse(idn2ascii(url)).netloc
             self.allowed_domains.append(domain)
             self.logger.debug(f"allowed_domains: {self.allowed_domains}")
+        if self.args.parent_contains_text and self.args.contains_text:
+            raise ValueError(
+                "parent_contains_text and contains_text are muturally "
+                "exclusive."
+            )
 
     async def start(self):
         for url in self.args.urls.split(","):
@@ -59,13 +96,26 @@ class WithSourceSpider(Args[MyParams], scrapy.Spider):
         """
         item = ArticleWithSourceItem.from_response(response)
 
-        # exract a list of href, using a query.
-        query = (
-            "//main//a[contains(., $text) or contains(parent::*, $text)]/@href"
-        )
+        if self.args.contains_text:
+            query = (
+                "//main//a[contains(., $arg)]/@href"
+            )
+            arg = self.args.contains_text
+        elif self.args.parent_contains_text:
+            query = (
+                "//main//a[contains(parent::*, $arg)]/@href"
+            )
+            arg = self.args.parent_contains_text
+        else:
+            ValueError(
+                "Neither contains_text nor parent_contains_text is specified. "
+                "Use either of them."
+            )
+
+        self.logger.debug(f"query: {query}\narg: {arg}\n")
         source_hrefs = response.xpath(
             query,
-            text=self.args.text,
+            arg=arg
         ).getall()
 
         # ensure URLs are absolute.

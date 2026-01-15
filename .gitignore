@@ -12,3 +12,4 @@ wheels/
 # cache directory
 /.scrapy/
 /tmp/
+/db/

@@ -45,6 +45,26 @@ The `lang` field follows the ISO 639-1:2002 standard for language codes, e.g.
 
 All time fields are in ISO 8601 format, e.g., `2026-01-13T11:12:43.874795+00:00`.
 
+An example:
+
+```json
+{
+  "acquired_time": "2026-01-15T14:00:01.001236+00:00",
+  "body": "<main>明治維新<p><hi rend=\"#b\">明治維新</hi>（めいじいしん）とは、19世紀...</main>",
+  "url": "https://ja.wikipedia.org/wiki/%E6%98%8E%E6%B2%BB%E7%B6%AD%E6%96%B0",
+  "lang": "ja",
+  "author": "ウィキメディアプロジェクトへの貢献者",
+  "description": null,
+  "kind": "website",
+  "modified_time": "2025-12-17T13:44:49+00:00",
+  "published_time": "2003-03-19T05:45:20+00:00",
+  "site_name": "ウィキメディア財団",
+  "title": "明治維新 - Wikipedia",
+  "item_type": "ArticleItem",
+  "character_count": 65502
+}
+```
+
 ### ArticleWithSourceItem
 
 This class is a subclass of `ArticleItem`. It has the following additional fields:

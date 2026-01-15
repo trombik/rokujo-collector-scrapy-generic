@@ -1,21 +1,19 @@
-from urllib.parse import urlparse
+from typing import Optional, Type
 
 import scrapy
 from lxml import etree
-from scrapy_spider_metadata import Args
 
 from generic.items import ArticleItem
-from generic.spiders.base import SpiderBaseConfig
-from generic.utils import idn2ascii
+from generic.spiders.base import GenericSpider, GenericSpiderConfig
 
 
-class ReadMoreSpiderConfig(SpiderBaseConfig):
+class ReadMoreSpiderConfig(GenericSpiderConfig):
     read_more: str = "記事全文を読む"
-    read_more_xpath: str = None
+    read_more_xpath: Optional[str] = None
     read_next: str = "次へ"
 
 
-class ReadMoreSpider(Args[ReadMoreSpiderConfig], scrapy.Spider):
+class ReadMoreSpider(GenericSpider[ReadMoreSpiderConfig]):
     """
     A spider to extract a main article from summary pages. It also supports a
     single page and multiple pages in an article. Useful when RSS feed does
@@ -89,17 +87,18 @@ class ReadMoreSpider(Args[ReadMoreSpiderConfig], scrapy.Spider):
     name = "read-more"
     allowed_domains = ["news.yahoo.co.jp"]
 
+    @classmethod
+    def get_config_class(cls) -> Type[ReadMoreSpiderConfig]:
+        """
+        Returns the config class for this spider.
+        """
+        return ReadMoreSpiderConfig
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        domains = []
-        for url in self.args.urls.split(","):
-            domains.append(urlparse(idn2ascii(url)).netloc)
-        unique_domains = list(set(domains))
-        self.allowed_domains.extend(unique_domains)
-        self.logger.debug(f"allowed_domains: {self.allowed_domains}")
 
     async def start(self):
-        for url in self.args.urls.split(","):
+        for url in self.args.urls:
             yield scrapy.Request(url, self.parse)
 
     def parse(self, res: scrapy.Request):

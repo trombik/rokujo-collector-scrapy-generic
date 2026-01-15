@@ -4,7 +4,20 @@ A collection of [Scrapy](https://docs.scrapy.org/) spiders designed to crawl
 web pages, scrape text content, and generate structured JSONL entries.
 
 These JSONL entries serve as a foundation for further processing, such as
-creating collocation databases, helping development of tools for translators.
+creating collocation databases and assisting in the development of tools for
+translators.
+
+Use cases:
+
+- Create a collocation database from web articles.
+- Create a database of source and target versions of web articles.
+- Create a database of commonly used technical terms by experts.
+
+The spiders are focused, designed to crawl a specific website. They do not
+crawl multiple websites. If you are looking for crawlers that crawl the entire
+internet, they are not for you.
+
+The spiders collects texts from an article, not images nor links.
 
 ## JSONL Data Structure
 
@@ -52,7 +65,6 @@ uv run scrapy crawl -a "arg1=value1" -a "arg2=value2" ${spider_name}
 All spider accepts a set of common arguments:
 
 - `urls`: Comma-separated list of URLs to start crawling.
-
 
 ### ReadMoreSpider
 

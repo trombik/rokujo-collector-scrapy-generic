@@ -13,3 +13,6 @@ wheels/
 /.scrapy/
 /tmp/
 /db/
+
+# default output files for development
+/foo.*

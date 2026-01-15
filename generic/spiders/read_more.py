@@ -2,21 +2,20 @@ from urllib.parse import urlparse
 
 import scrapy
 from lxml import etree
-from pydantic import BaseModel
 from scrapy_spider_metadata import Args
 
 from generic.items import ArticleItem
+from generic.spiders.base import SpiderBaseConfig
 from generic.utils import idn2ascii
 
 
-class MyParams(BaseModel):
-    urls: str
+class ReadMoreSpiderConfig(SpiderBaseConfig):
     read_more: str = "記事全文を読む"
     read_more_xpath: str = None
     read_next: str = "次へ"
 
 
-class ReadMoreSpider(Args[MyParams], scrapy.Spider):
+class ReadMoreSpider(Args[ReadMoreSpiderConfig], scrapy.Spider):
     """
     A spider to extract a main article from summary pages. It also supports a
     single page and multiple pages in an article. Useful when RSS feed does

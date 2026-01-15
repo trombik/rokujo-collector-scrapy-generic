@@ -127,7 +127,7 @@ def get_metadata(res: Response) -> dict:
         ),
         "lang": (locale_to_lang(res.xpath("/html/@lang").get()) or None),
         "site_name": (og.get("og:site_name") or dig(ld, "publisher", "name")),
-        "kind": (og.get("og:type") or ld.get("@type")),
+        "kind": (og.get("og:type") or og.get("@type") or ld.get("@type")),
         "author": (
             og.get("og:author")
             or dig(ld, "author", "name")

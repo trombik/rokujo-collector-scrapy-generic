@@ -21,6 +21,7 @@ class SpiderRunner:
     """
     A runner to run a spider.
     """
+
     def __init__(self, config: SpiderRunnerConfig):
         """
         The constructor.

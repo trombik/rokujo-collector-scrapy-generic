@@ -37,6 +37,7 @@ INVALID_URL_PARAMS = pytest.mark.parametrize(
     ],
 )
 
+
 class TestGenericSpiderConfig:
     def test_urls_accepts_empty_list(self):
         urls = []

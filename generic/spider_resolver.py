@@ -60,6 +60,4 @@ class SpiderResolverNoRouteError(SpiderResolverError):
 
     def __init__(self, url: str, routes):
         self.url = url
-        super().__init__(
-            f"No routes matches URL: {url}\nroutes:\n{routes}\n"
-        )
+        super().__init__(f"No routes matches URL: {url}\nroutes:\n{routes}\n")

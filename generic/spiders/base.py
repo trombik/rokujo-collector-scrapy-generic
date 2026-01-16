@@ -48,6 +48,8 @@ class GenericSpider(Args[T], scrapy.Spider, Generic[T]):
     A base spider class that inherits scrapy.Spider.
     """
 
+    allowed_domains = []
+
     @classmethod
     def get_config_class(cls) -> Type[T]:
         """
@@ -59,7 +61,6 @@ class GenericSpider(Args[T], scrapy.Spider, Generic[T]):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        domains = []
         # urls is either str or List[str]
         urls = (
             [self.args.urls]
@@ -67,6 +68,8 @@ class GenericSpider(Args[T], scrapy.Spider, Generic[T]):
             else self.args.urls
         )
 
+        # allowed_domains does not support IDN. fix it up.
+        domains = []
         for url in urls:
             domains.append(urlparse(idn2ascii(url)).netloc)
         unique_domains = list(set(domains))

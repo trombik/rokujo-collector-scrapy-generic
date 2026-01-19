@@ -87,7 +87,7 @@ summary pages. It is particularly useful when an RSS feed does not provide a
 direct link to the main article but instead points to a landing page.
 
 The spider is versatile and can be used for a single page, a book of multiple
-pages with "Next page" links, web articles splitted into multiple pages.
+pages with "Next page" links, web articles splinted into multiple pages.
 
 #### Features
 
@@ -100,7 +100,7 @@ pages with "Next page" links, web articles splitted into multiple pages.
      summary page to the main article page.
   2. **First page -> Main article page -> Next page(s)**: The spider navigates
      to the main article page and then to subsequent pages within the article.
-  3. **First page -> Next page(s)**: The spider processes the fisrt page and
+  3. **First page -> Next page(s)**: The spider processes the first page and
      any subsequent pages.
 
 #### How it works
@@ -121,3 +121,39 @@ generates an `ArticleItem`.
 After generating a complete `ArticleItem`, the spider looks for `sources` on
 the last page. If any sources are found, it crawls and scrape each source
 article.
+
+### FeedSpider
+
+The `FeedSpider` scrapes pages, generating Atom/RSS feeds. The spider is useful
+for websites that do not provide feeds. The generated feed is minimalistic for
+machines. The primary purpose of the spider is to create feeds for
+`ReadMoreSpider`.
+
+#### Features
+
+- **Feed Generation**: The spider generates Atom/RSS feeds from a page.
+
+#### How it works
+
+The spider reads a configuration file in YAML format.
+
+```yaml
+---
+feed_config:
+  "http://foo.example.org/latest.html":
+    file_name: "latest.xml"
+    feed_type: "atom"
+    xpath_href: "//li[@class='articles-list__item']/a/@href"
+    xpath_title: "//li[@class='articles-list__item']/a/text()"
+
+```
+
+`feed_config` is a dictionary. The key is the page URL for the feed. The
+spider crawls the page and parse the HTML with the following options:
+
+
+- `file_name`: The name of the generated feed file. This must be unique per
+               URL. The file is overwritten when a feed is generated.
+- `xpath_title` is the path to the feed title.
+- `xpath_href` is the path to the `href` attribute of the link.
+- `feed_type` is either `atom` or `rss`.

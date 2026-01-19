@@ -5,7 +5,7 @@ import scrapy
 from pydantic import BaseModel
 from scrapy_spider_metadata import Args
 
-from generic.items import ArticleItem, ArticleWithSourceItem
+from generic.items import ArticleItem
 from generic.utils import idn2ascii
 
 
@@ -49,7 +49,7 @@ class MyParams(BaseModel):
 
 class WithSourceSpider(Args[MyParams], scrapy.Spider):
     """
-    Yields an ArticleWithSourceItem from URLs.
+    Yields an ArticleItem from URLs.
 
     The spider crawls given URLs and scrapes the article and source articles
     if it finds them.
@@ -60,7 +60,7 @@ class WithSourceSpider(Args[MyParams], scrapy.Spider):
         urls: Comma-separated string of summary page URLs. Mandatory.
 
     Yields:
-        ArticleWithSourceItem
+        ArticleItem
     """
 
     name = "with-source"
@@ -88,13 +88,13 @@ class WithSourceSpider(Args[MyParams], scrapy.Spider):
         """
         Parse the target page. If the target page has sources, fetch and
         extract them as ArticleItem. The sources are appended to
-        ArticleWithSourceItem.
+        ArticleItem.
 
         Yields:
-            ArticleWithSourceItem
+            ArticleItem
 
         """
-        item = ArticleWithSourceItem.from_response(response)
+        item = ArticleItem.from_response(response)
 
         if self.args.contains_text:
             query = "//main//a[contains(., $arg)]/@href"
@@ -145,12 +145,12 @@ class WithSourceSpider(Args[MyParams], scrapy.Spider):
     def parse_source(
         self,
         res: scrapy.http.Response,
-        parent_item: ArticleWithSourceItem,
+        parent_item: ArticleItem,
         remaining_urls: List[str],
     ):
         """
         Parse a source of an article and append a ArticleItem to the parent
-        ArticleWithSourceItem.
+        ArticleItem.
 
         Args:
             res: The HTTP response

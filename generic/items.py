@@ -18,7 +18,7 @@ from generic.utils import count_xml_character, get_metadata
 @dataclass
 class ArticleItem:
     """
-    Represents an article.
+    Represents an article. An article may have a list of articles.
     """
 
     acquired_time: datetime
@@ -54,6 +54,8 @@ class ArticleItem:
     """ The class name of the item. Automatically set in __post_init__."""
     character_count: int = 0
     """ The number of characters in the article."""
+    sources: List[Self] = field(default_factory=list)
+    """ A list of sources. """
 
     def __post_init__(self):
         self.item_type = self.__class__.__name__
@@ -128,13 +130,3 @@ class ArticleItem:
             published_time=metadata["published_time"],
             modified_time=metadata["modified_time"],
         )
-
-
-@dataclass
-class ArticleWithSourceItem(ArticleItem):
-    """
-    An ArticleItem that includes a list of related ArticleItems as sources.
-    """
-
-    sources: List[ArticleItem] = field(default_factory=list)
-    """ A list of sources. """

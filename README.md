@@ -39,6 +39,7 @@ is a JSON object with the following fields:
 - `site_name`: The name of the website on which the article was published. (Optional)
 - `title`: The title of the article. (Optional)
 - `url`: The URL of the article. (Required)
+- `sources`: A list of `ArticleItem`. Each source is a source article of the `ArticleItem`.
 
 The `lang` field follows the ISO 639-1:2002 standard for language codes, e.g.
 `en`, `ja`, etc.
@@ -64,14 +65,6 @@ An example:
   "character_count": 65502
 }
 ```
-
-### ArticleWithSourceItem
-
-This class is a subclass of `ArticleItem`. It has the following additional fields:
-
-- `sources`: A list of `ArticleItem`. Each source is a source article of the `ArticleWithSourceItem`.
-
-The class is useful when an article is a translated version and has sources, such as English version.
 
 ## Spiders
 

@@ -130,3 +130,25 @@ class ArticleItem:
             published_time=metadata["published_time"],
             modified_time=metadata["modified_time"],
         )
+
+
+@dataclass
+class FeedItem:
+    file_name: str
+    """
+    The file name of the feed.
+    """
+    url: str
+    """
+    The URL of the page from which the feed was generated.
+    """
+    content: str
+    """
+    The feed XML.
+    """
+    generated_at: str = field(
+        default_factory=lambda: datetime.now().isoformat()
+    )
+    """
+    The time in ISO 8601 format in which the feed was generated.
+    """

@@ -62,7 +62,8 @@ An example:
   "site_name": "ウィキメディア財団",
   "title": "明治維新 - Wikipedia",
   "item_type": "ArticleItem",
-  "character_count": 65502
+  "character_count": 65502,
+  "sources" []
 }
 ```
 
@@ -116,3 +117,7 @@ When a `read_next` link is found, the spider navigates to the next page.
 
 When a `read_next` link is not found, the spider finishes crawling and
 generates an `ArticleItem`.
+
+After generating a complete `ArticleItem`, the spider looks for `sources` on
+the last page. If any sources are found, it crawls and scrape each source
+article.

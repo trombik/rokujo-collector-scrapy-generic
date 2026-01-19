@@ -11,6 +11,9 @@ class ReadMoreSpiderConfig(GenericSpiderConfig):
     read_more: str = "記事全文を読む"
     read_more_xpath: Optional[str] = None
     read_next: str = "次へ"
+    read_next_contains: Optional[str] = None
+    source_contains: Optional[str] = None
+    source_parent_contains: Optional[str] = None
 
 
 class ReadMoreSpider(GenericSpider[ReadMoreSpiderConfig]):
@@ -81,7 +84,48 @@ class ReadMoreSpider(GenericSpider[ReadMoreSpiderConfig]):
                 (<li>) and then into the link tag (<a>) found inside it.
 
         read_next: Text string of the <a> tag that links to the next page.
+
+                   The spider finds the link to the next page that matches the
+                   exact value of the argument.
+
                    Default is "次へ".
+
+        read_next_contains: Text string of the <a> tag that links to the next
+                            page.
+
+                            The spider finds the link to the next page that
+                            contains the value of the argument.
+
+                            Default is "None"
+
+        source_contains:
+            Matches <a> tag, whose text contains `contains_text`.
+
+            An example:
+
+            When `contains_text` is `US版`, the spider picks all the following
+            <a> tags.
+
+            ```html
+            <main>
+                <a>US版</a>
+                <p><a>US版</a></a>
+            </main>
+            ```
+
+        source_parent_contains:
+            Match <a> tags whose parent contains the value.
+
+            An example:
+
+            When `parent_contains_text` is `英語記事`, the spider picks all the
+            following <a> tags.
+
+            ```html
+            <main>
+                <p>英語記事: <a href="#">foo</a> / <a href="#">bar</a></p>
+            </main>
+            ```
     """
 
     name = "read-more"
@@ -195,10 +239,25 @@ class ReadMoreSpider(GenericSpider[ReadMoreSpiderConfig]):
         self.logger.debug(f"Created ArticleItem for: {item.url}")
 
         # we've done with parsing the response. find "Next page" link.
-        self.logger.debug(f"Searching read_next with: {self.args.read_next}")
-        read_next_href = res.xpath(
-            "//a[text()=$text]/@href", text=self.args.read_next
-        ).get()
+
+        if self.args.read_next_contains:
+            self.logger.debug(
+                (
+                    "Searching read_next_contains with: ",
+                    f"{self.args.read_next_contains}"
+                )
+            )
+            read_next_href = res.xpath(
+                "//a[contains(., $text)]/@href",
+                text=self.args.read_next_contains,
+            ).get()
+        elif self.args.read_next:
+            self.logger.debug(
+                f"Searching read_next with: {self.args.read_next}"
+            )
+            read_next_href = res.xpath(
+                "//a[text()=$text]/@href", text=self.args.read_next
+            ).get()
 
         if read_next_href:
             self.logger.debug(f"Found another page: {read_next_href}")
@@ -210,6 +269,92 @@ class ReadMoreSpider(GenericSpider[ReadMoreSpiderConfig]):
                 cb_kwargs={"item": item},
             )
         else:
-            # the response is the last page. Simply yield the item
+            # We are on the last page. Search for source articles here.
             self.logger.debug(f"Done with ArticleItem for {item.url}")
+            yield from self._find_and_request_sources(res, item)
+
+    def _find_and_request_sources(
+        self,
+        res: scrapy.http.Response,
+        item: ArticleItem
+    ):
+        """
+        Find source articles.
+        """
+        query = None
+        arg = None
+        if self.args.source_contains:
+            query = "//a[contains(., $arg)]/@href"
+            arg = self.args.source_contains
+        elif self.args.source_parent_contains:
+            query = "//a[contains(parent::*, $arg)]/@href"
+            arg = self.args.source_parent_contains
+        # no options for sources. yield item and finish.
+        if not query:
             yield item
+            return
+
+        self.logger.debug(f"query: {query}\narg: {arg}\n")
+        source_hrefs = res.xpath(query, arg=arg).getall()
+
+        # ensure URLs are absolute.
+        source_urls = [res.urljoin(href) for href in source_hrefs]
+        unique_urls = list(dict.fromkeys(source_urls))
+        self.logger.debug(f"Found unique_urls: {unique_urls}")
+
+        # no source URLs, yield the item.
+        if not unique_urls:
+            self.logger.debug(f"No source URLs found in {res.url}")
+            yield item
+        else:
+            self.logger.debug(f"Source URL(s) found: {unique_urls}")
+            yield from self._request_next_source(item, unique_urls)
+
+    def _request_next_source(
+        self,
+        item: ArticleItem,
+        urls: list[str],
+    ):
+        if not urls:
+            self.logger.debug("_request_next_source: Empty urls.")
+            yield item
+            return
+
+        next_url = urls.pop(0)
+        self.logger.debug(f"_request_next_source: next URL: {next_url}")
+        yield scrapy.Request(
+            next_url,
+            callback=self._parse_source_only,
+            cb_kwargs={
+                "parent_item": item,
+                "remaining_urls": urls,
+            },
+            dont_filter=True,
+        )
+
+    def _parse_source_only(
+        self,
+        res: scrapy.http.Response,
+        parent_item: ArticleItem,
+        remaining_urls: list[str],
+    ):
+        """
+        Parse source pages and add the source article to the parent item.
+
+        Unlike Japanese news outlets, English ones avoid pagenations in
+        general for better UX. The method assumes that the source page is a
+        single page article. It does not crawls "Next page".
+        """
+
+        # acoid exceptions here to save the parent item even if it fails to
+        # scrape the source article. otherwise, an exception here causes the
+        # entire process to fail, resulting data loss of the parent item.
+        try:
+            source_item = ArticleItem.from_response(res)
+            parent_item.sources.append(source_item)
+        except Exception as e:
+            self.logger.error(
+                f"Failed to scrape a source article at: {res.url} {e}"
+            )
+
+        yield from self._request_next_source(parent_item, remaining_urls)

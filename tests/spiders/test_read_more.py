@@ -151,6 +151,28 @@ class TestReadMoreSpider:
 
                 assert results[0].url == f"{url_default}xpath-article.html"
 
+        class TestWhenReadNextContainsIsGiven:
+            def test_yields_request_to_next_page_using_read_next_contains(
+                self,
+                url_default,
+                html_template,
+                make_spider,
+            ):
+                body = html_template(
+                    """
+                    <a href="./article-001.html">次へ 「次のページ」</a>
+                    """
+                )
+                response = HtmlResponse(
+                    url=url_default, body=body, encoding="utf-8"
+                )
+                spider = make_spider(read_next_contains="次へ")
+                results = list(spider.parse(response))
+                assert len(results) == 1
+                request = results[0]
+                assert isinstance(request, scrapy.Request)
+                assert request.url == f"{url_default}article-001.html"
+
     class TestParseArticle:
         class TestWhenItemIsNone:
             def test_parses_response_and_yields_request_to_next_page(

@@ -158,6 +158,23 @@ spider crawls the page and parse the HTML with the following options:
 - `xpath_href` is the path to the `href` attribute of the link.
 - `feed_type` is either `atom` or `rss`.
 
+### ArchiveSpider
+
+This spider parses archive pages, follows links to articles, and moves to the next archive page if available.
+
+### Features
+
+- Supports most archive pages with paginated navigation.
+
+The spider's configuration is `ArchiveSpiderConfig`, which inherits from
+`ReadMoreSpiderConfig`. In addition to the options supported by
+`ReadMoreSpiderConfig`, `ArchiveSpiderConfig` supports the following options.
+
+    * `archive_article_xpath`
+        A XPath expression to the href attribute of an <a> tag for articles.
+    * `archive_next_xpath`
+        A XPath expression to the href attribute of an <a> tag for the "Next" archive page.
+
 ## Development
 
 ### Documentation

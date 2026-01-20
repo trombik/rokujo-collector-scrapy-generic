@@ -157,3 +157,13 @@ spider crawls the page and parse the HTML with the following options:
 - `xpath_title` is the path to the feed title.
 - `xpath_href` is the path to the `href` attribute of the link.
 - `feed_type` is either `atom` or `rss`.
+
+## Development
+
+### Documentation
+
+To generate the documentation, run `make`:
+
+```console
+make docs
+```

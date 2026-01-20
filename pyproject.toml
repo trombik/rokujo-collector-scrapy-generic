@@ -7,14 +7,8 @@ requires-python = ">=3.11"
 dependencies = [
     "extruct>=0.18.0",
     "feedgen>=1.0.0",
-    "flake8-pytest-style>=2.2.0",
-    "honcho>=2.0.0",
-    "ipython>=9.9.0",
-    "pproxy>=2.7.9",
-    "pytest-mock>=3.15.1",
     "pyyaml>=6.0.3",
     "reader>=3.21",
-    "ruff>=0.14.11",
     "scrapy>=2.14.0",
     "scrapy-spider-metadata>=0.2.0",
     "scrapy-user-agents>=0.1.1",
@@ -31,3 +25,16 @@ select = ["E", "W", "I"]
 strict = true
 pythonpath = ["."]
 testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "flake8-pytest-style>=2.2.0",
+    "furo>=2025.12.19",
+    "honcho>=2.0.0",
+    "ipython>=9.9.0",
+    "myst-parser>=5.0.0",
+    "pproxy>=2.7.9",
+    "pytest-mock>=3.15.1",
+    "ruff>=0.14.11",
+    "sphinx>=9.0.4",
+]

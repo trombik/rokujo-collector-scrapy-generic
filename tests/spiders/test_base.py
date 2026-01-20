@@ -146,3 +146,22 @@ class TestGenericSpider:
             spider_cls(urls=[valid_url])
         except ValidationError:
             pytest.fail("Expected not to raise ValidationError but raised")
+
+
+class MockSpider(GenericSpider[GenericSpiderConfig]):
+    name = "mock_spider"
+
+    @classmethod
+    def get_config_class(cls):
+        return GenericSpiderConfig
+
+
+def test_allowed_domains_isolation():
+    config1 = GenericSpiderConfig(urls="https://first.example.org")
+    spider1 = MockSpider(**vars(config1))
+
+    config2 = GenericSpiderConfig(urls="https://second.example.org")
+    spider2 = MockSpider(**vars(config2))
+
+    assert spider1.allowed_domains == ["first.example.org"]
+    assert spider2.allowed_domains == ["second.example.org"]

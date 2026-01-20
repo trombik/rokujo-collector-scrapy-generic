@@ -73,5 +73,10 @@ class GenericSpider(Args[T], scrapy.Spider, Generic[T]):
         for url in urls:
             domains.append(urlparse(idn2ascii(url)).netloc)
         unique_domains = list(set(domains))
-        self.allowed_domains.extend(unique_domains)
+
+        # Instead of self.allowed_domains.extend(), we assign a new list to
+        # self.allowed_domains. This ensures that we are creating an instance
+        # attribute that masks the class attribute, preventing side effects
+        # (pollution) on other spider instances.
+        self.allowed_domains = unique_domains
         self.logger.debug(f"allowed_domains: {self.allowed_domains}")

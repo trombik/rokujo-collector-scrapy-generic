@@ -19,6 +19,24 @@ internet, they are not for you.
 
 The spiders collects texts from an article, not images nor links.
 
+<!-- vim-markdown-toc GFM -->
+
+* [JSONL Data Structure](#jsonl-data-structure)
+    * [ArticleItem](#articleitem)
+* [Spiders](#spiders)
+    * [ReadMoreSpider](#readmorespider)
+        * [Features](#features)
+        * [How it works](#how-it-works)
+    * [FeedSpider](#feedspider)
+        * [Features](#features-1)
+        * [How it works](#how-it-works-1)
+    * [ArchiveSpider](#archivespider)
+    * [Features](#features-2)
+* [Development](#development)
+    * [Documentation](#documentation)
+
+<!-- vim-markdown-toc -->
+
 ## JSONL Data Structure
 
 ### ArticleItem

@@ -84,6 +84,8 @@ def get_metadata(res: Response) -> dict:
 
     Returns: dict
     """
+    author = res.xpath("//meta[@name='author']/@content").get()
+
     data = get_uniform_metadata(res.text, res.url)
 
     og_list = data.get("opengraph", [])
@@ -129,7 +131,8 @@ def get_metadata(res: Response) -> dict:
         "site_name": (og.get("og:site_name") or dig(ld, "publisher", "name")),
         "kind": (og.get("og:type") or og.get("@type") or ld.get("@type")),
         "author": (
-            og.get("og:author")
+            author
+            or og.get("og:author")
             or dig(ld, "author", "name")
             or dig(ld, "author", 0, "name")
         ),

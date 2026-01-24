@@ -5,4 +5,6 @@ rokujo-collector-scrapy-generic
    :maxdepth: 2
    :caption: Contents:
 
+   introduction
+   spiders/ReadMoreSpider
    modules

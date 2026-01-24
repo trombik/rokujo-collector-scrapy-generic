@@ -64,6 +64,8 @@ DOWNLOADER_MIDDLEWARES = {
 
 ITEM_PIPELINES = {
     "generic.pipelines.DropMissingTextPipeline": 100,
+    "generic.pipelines.FileItemPipeline": 200,
+    "generic.pipelines.FileItemStoragePipeline": 900,
 }
 #    "generic.pipelines.GenericPipeline": 300,
 # }

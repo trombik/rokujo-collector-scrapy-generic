@@ -8,11 +8,35 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Self
 
+import scrapy
 from scrapy.http import Response
 from scrapy.selector import Selector
 from trafilatura import extract
 
 from generic.utils import count_xml_character, get_metadata
+
+
+class FileItem(scrapy.Item):
+    acquired_time = scrapy.Field()
+    """ The time when the webpage was acquired. """
+
+    content = scrapy.Field(serializer=lambda x: f"<{len(x)} bytes>")
+    """ The file content as bytes. """
+
+    filename = scrapy.Field()
+    url = scrapy.Field()
+    metadata = scrapy.Field()
+    output_dir = scrapy.Field()
+
+    def __repr__(self):
+        """
+        Surpress binary data in log. content often is binary data and
+        unnecessary in log output.
+        """
+        p = dict(self)
+        if "content" in p and isinstance(p["content"], bytes):
+            p["content"] = f"<{len(p['content'])} bytes>"
+        return f"FileItem({p!r})"
 
 
 @dataclass

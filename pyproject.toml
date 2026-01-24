@@ -7,6 +7,8 @@ requires-python = ">=3.11"
 dependencies = [
     "extruct>=0.18.0",
     "feedgen>=1.0.0",
+    "pathvalidate>=3.3.1",
+    "pikepdf>=10.2.0",
     "pyyaml>=6.0.3",
     "reader>=3.21",
     "scrapy>=2.14.0",

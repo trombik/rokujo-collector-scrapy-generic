@@ -1,18 +1,13 @@
-from typing import Optional, Type
+from typing import Type
 
 import scrapy
 
-from generic.mixins.read_more import ReadMoreMixin
-from generic.spiders.base import GenericSpider, GenericSpiderConfig
+from generic.mixins.read_more import ReadMoreMixin, ReadMoreMixinConfig
+from generic.spiders.base import GenericSpider
 
 
-class ReadMoreSpiderConfig(GenericSpiderConfig):
-    read_more: str = "記事全文を読む"
-    read_more_xpath: Optional[str] = None
-    read_next: str = "次へ"
-    read_next_contains: Optional[str] = None
-    source_contains: Optional[str] = None
-    source_parent_contains: Optional[str] = None
+class ReadMoreSpiderConfig(ReadMoreMixinConfig):
+    pass
 
 
 class ReadMoreSpider(GenericSpider[ReadMoreSpiderConfig], ReadMoreMixin):

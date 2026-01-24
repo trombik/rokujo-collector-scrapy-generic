@@ -161,3 +161,91 @@ def count_xml_character(xml_string: str) -> int:
     full_text = "".join(texts)
     clean_text = re.sub(r"\s+", "", full_text)
     return len(clean_text)
+
+
+def generate_hashed_filename(
+    url,
+    domain_size: int = 8,
+    url_size: int = 32,
+    max_len: int = 255,
+) -> str:
+    """
+    Generate a safe filename with a hashed prefix, keeping the file name
+    human-friendly but sortable by URL-relevance.
+
+    Supports URL-encoded file name.
+
+    The generated file name is hashed by domain and path of the URL.
+
+    The length of the generated file name is ensured to be less or equals to
+    max_len.
+
+    Args:
+        domain_size: The size of domain hash characters.
+        url_size: The size of URL hash characters.
+        max_len: Max allowed bytes in file names. Defaults to 255.
+    """
+    import os
+    from hashlib import shake_128
+    from urllib.parse import unquote, urlparse
+
+    from pathvalidate import sanitize_filename
+
+    parsed = urlparse(url)
+    domain = parsed.netloc
+
+    raw_path = unquote(parsed.path)
+    basename = os.path.basename(raw_path) or "index"
+
+    root, ext = os.path.splitext(basename)
+    ext = sanitize_filename(
+        filename=ext,
+        max_len=10,
+    )
+
+    domain_hash = shake_128(domain.encode()).hexdigest(domain_size // 2)
+    url_hash = shake_128(url.encode()).hexdigest(url_size // 2)
+
+    prefix = f"{domain_hash}-{url_hash}-"
+    prefix_len = len(prefix.encode("utf-8"))
+    ext_len = len(ext.encode("utf-8"))
+    allowed_max_len_for_root = max_len - prefix_len - ext_len
+    if allowed_max_len_for_root <= 0:
+        raise ValueError(
+            "domain_size and/or url_size too big. "
+            "Reduce domain_size and/or url_size.\n"
+            f"max_len: {max_len}\n"
+            f"domain_size: {domain_size}\n"
+            f"url_size: {url_size}\n"
+        )
+
+    root = sanitize_filename(
+        filename=root,
+        max_len=allowed_max_len_for_root,
+    )
+    return f"{prefix}{root}{ext}"
+
+
+def is_path_matched(url: str, regexp: str) -> bool:
+    if not url or not regexp:
+        return False
+
+    import re
+    from urllib.parse import unquote, urlparse
+
+    parsed_path = urlparse(url).path
+    path = unquote(parsed_path) if parsed_path else "/"
+
+    return bool(re.search(regexp, path))
+
+
+def is_file_url(
+    url: str, regexp: str = r"(?:/|\.html?|\.php|\.aspx?|/[^./]+)$"
+) -> bool:
+    """
+    Returns bool whether if the givne url is a URL to a file, not HTML page.
+    """
+    if not url:
+        return False
+
+    return not is_path_matched(url, regexp)

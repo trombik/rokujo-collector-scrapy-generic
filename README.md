@@ -21,6 +21,7 @@ The spiders collects texts from an article, not images nor links.
 
 <!-- vim-markdown-toc GFM -->
 
+* [Requirements](#requirements)
 * [JSONL Data Structure](#jsonl-data-structure)
     * [ArticleItem](#articleitem)
 * [Spiders](#spiders)
@@ -36,6 +37,15 @@ The spiders collects texts from an article, not images nor links.
     * [Documentation](#documentation)
 
 <!-- vim-markdown-toc -->
+
+## Requirements
+
+* Python 3.11 or newer
+* [uv](https://github.com/astral-sh/uv)
+    * [Documentation](https://docs.astral.sh/uv/)
+* [qpdf](https://github.com/qpdf/qpdf)
+    * [Binaries](https://github.com/qpdf/qpdf/releases)
+    * [Documentation](https://qpdf.readthedocs.io/en/stable/)
 
 ## JSONL Data Structure
 

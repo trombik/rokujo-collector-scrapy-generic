@@ -1,0 +1,7 @@
+main p {
+    font-size: 1.2em;
+}
+
+:root {
+    --pst-font-family-base: "Plus Jakarta Sans";
+}

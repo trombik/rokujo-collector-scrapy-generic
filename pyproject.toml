@@ -9,12 +9,12 @@ dependencies = [
     "feedgen>=1.0.0",
     "pathvalidate>=3.3.1",
     "pikepdf>=10.2.0",
+    "pydata-sphinx-theme>=0.16.1",
     "pyyaml>=6.0.3",
     "reader>=3.21",
     "scrapy>=2.14.0",
     "scrapy-spider-metadata>=0.2.0",
     "scrapy-user-agents>=0.1.1",
-    "sphinxcontrib-mermaid>=2.0.0",
     "trafilatura[all]>=2.0.0",
 ]
 
@@ -32,7 +32,6 @@ testpaths = ["tests"]
 [dependency-groups]
 dev = [
     "flake8-pytest-style>=2.2.0",
-    "furo>=2025.12.19",
     "honcho>=2.0.0",
     "ipython>=9.9.0",
     "myst-parser>=5.0.0",
@@ -40,4 +39,5 @@ dev = [
     "pytest-mock>=3.15.1",
     "ruff>=0.14.11",
     "sphinx>=9.0.4",
+    "sphinxcontrib-mermaid>=2.0.0",
 ]

@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../../"))
 
-project = "rokujo-collector-scrapy-generic"
+project = "rokujo-scrapy-generic"
 copyright = "2026, Tomoyuki Sakurai"
 author = "Tomoyuki Sakurai"
 
@@ -14,7 +14,7 @@ extensions = [
     "sphinxcontrib.mermaid",
 ]
 
-html_theme = "furo"
+html_theme = "pydata_sphinx_theme"
 
 source_suffix = {
     ".rst": "restructuredtext",
@@ -26,14 +26,11 @@ myst_enable_extensions = [
 ]
 
 html_theme_options = {
-    "light_css_variables": {
-        "font-stack": "Arial, sans-serif",
-        "font-stack--monospace": "Courier, monospace",
-        "font-stack--headings": "Georgia, serif",
-    },
-    "dark_css_variables": {
-        "font-stack": "Arial, sans-serif",
-        "font-stack--monospace": "Courier, monospace",
-        "font-stack--headings": "Georgia, serif",
-    },
 }
+
+html_static_path = ["_static"]
+html_css_files = [
+    "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap",  # noqa E501
+    "custom.css"
+]
+html_title = project

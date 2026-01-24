@@ -13,7 +13,7 @@ VALID_URL_PARAMS = pytest.mark.parametrize(
         "http://localhost/path/",
         "http://[fe80::a1b3:125d:c1f8:4781]:8080/path/",
         "http://user@password@example.org:8080/path/?query=string",
-    ]
+    ],
 )
 INVALID_URL_PARAMS = pytest.mark.parametrize(
     "invalid_url",
@@ -136,7 +136,7 @@ class TestGenericSpider:
 
     @VALID_URL_PARAMS
     def test_validate_urls_and_not_to_raise_exception(
-            self, spider_cls, valid_url
+        self, spider_cls, valid_url
     ):
         try:
             spider_cls(urls=valid_url)

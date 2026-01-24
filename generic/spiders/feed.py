@@ -70,6 +70,7 @@ class FeedConfig(BaseModel):
     ```
 
     """
+
     file_name: str
     xpath_href: str
     xpath_title: str
@@ -94,6 +95,7 @@ class FeedSpider(GenericSpider[FeedSpiderConfig]):
             The default is `feed.yml`.
 
     """
+
     name = "feed"
     custom_settings = {
         "ITEM_PIPELINES": {
@@ -125,9 +127,7 @@ class FeedSpider(GenericSpider[FeedSpiderConfig]):
         content = path.read_text(encoding="utf-8")
         raw_data = yaml.safe_load(content)
         return FeedSpiderConfig(
-            urls=[],
-            feed_config=raw_data.get("feed_config", {}),
-            config=path
+            urls=[], feed_config=raw_data.get("feed_config", {}), config=path
         )
 
     def start_requests(self):
@@ -143,9 +143,9 @@ class FeedSpider(GenericSpider[FeedSpiderConfig]):
         config = self.args.feed_config[url]
         xpath_title = config.xpath_title
         xpath_href = config.xpath_href
-        page_title = response.xpath(
-            "//title/text()"
-        ).get() or f"Feed for {url}"
+        page_title = (
+            response.xpath("//title/text()").get() or f"Feed for {url}"
+        )
 
         titles = response.xpath(xpath_title).getall()
         hrefs = response.xpath(xpath_href).getall()
@@ -157,10 +157,7 @@ class FeedSpider(GenericSpider[FeedSpiderConfig]):
                 FeedEntry(id=abs_url, title=title.strip(), link=abs_url)
             )
         feed_meta = Feed(
-            id=url,
-            type=config.feed_type,
-            lang=lang,
-            title=page_title
+            id=url, type=config.feed_type, lang=lang, title=page_title
         )
         yield self._generate_feed(
             url=url,

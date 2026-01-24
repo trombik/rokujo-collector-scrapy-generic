@@ -26,10 +26,7 @@ class ReadMoreMixin:
     Provides recursive article parsing capability. See also: ReadMoreSpider.
     """
 
-    def parse_summary_page(
-        self,
-        res: scrapy.http.Response
-    ):
+    def parse_summary_page(self, res: scrapy.http.Response):
         """
         Parse the summary article. If "Read more" link is not found, it
         assumes that the page is the main article and parse it as an article.
@@ -48,9 +45,7 @@ class ReadMoreMixin:
             yield from self.parse_article(res)
 
     def parse_article(
-        self,
-        res: scrapy.http.Response,
-        item: ArticleItem = None
+        self, res: scrapy.http.Response, item: ArticleItem = None
     ):
         """
         Parse an article.
@@ -177,7 +172,7 @@ class ReadMoreMixin:
             self.logger.debug(
                 (
                     "Searching read_next_contains with: ",
-                    f"{self.args.read_next_contains}"
+                    f"{self.args.read_next_contains}",
                 )
             )
             return res.xpath(
@@ -291,9 +286,7 @@ class ReadMoreMixin:
         return list(dict.fromkeys(source_urls))
 
     def _find_and_request_sources(
-        self,
-        res: scrapy.http.Response,
-        item: ArticleItem
+        self, res: scrapy.http.Response, item: ArticleItem
     ):
         """
         Find source articles.

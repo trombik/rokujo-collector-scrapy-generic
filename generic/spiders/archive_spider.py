@@ -17,6 +17,7 @@ class ArchiveSpiderConfig(ReadMoreSpiderConfig):
         archive_next_xpath (Optional[str]):
             XPath expression to extract the link to the next archive page.
     """
+
     archive_article_xpath: Optional[str] = (
         "//main//li[@class!=' pr']//h2[@class='title']//a/@href"
     )
@@ -27,9 +28,9 @@ class ArchiveSpiderConfig(ReadMoreSpiderConfig):
 
 
 class ArchiveSpider(
-        GenericSpider[ArchiveSpiderConfig],
-        ReadMoreMixin,
-        ):
+    GenericSpider[ArchiveSpiderConfig],
+    ReadMoreMixin,
+):
     """
     Parse archive pages, follow links to articles, and proceed to the next
     archive page if any.
@@ -52,6 +53,7 @@ class ArchiveSpider(
         A XPath expression to the href attribute of an <a> tag for the "Next"
         archive page.
     """
+
     name = "archive_spider"
     allowed_domains = ["bunshun.jp"]
     start_urls = ["https://bunshun.jp/category/latest?page=300"]
@@ -93,21 +95,15 @@ class ArchiveSpider(
 
         for article_href in article_hrefs:
             self.logger.debug(f"Found href: {article_href}")
-            yield response.follow(
-                article_href,
-                callback=self.parse_article
-            )
+            yield response.follow(article_href, callback=self.parse_article)
 
         self.logger.debug(
             "Looking for a tag with archive_next_xpath"
             f"archive_article_xpath:\n{self.args.archive_next_xpath}"
         )
-        archive_next_href = response.xpath(
-            self.args.archive_next_xpath
-        ).get()
+        archive_next_href = response.xpath(self.args.archive_next_xpath).get()
         if archive_next_href:
             self.logger.debug(f"Found href: {archive_next_href}")
             yield response.follow(
-                archive_next_href,
-                callback=self.parse_archive_index
+                archive_next_href, callback=self.parse_archive_index
             )

@@ -1,12 +1,9 @@
-.PHONY: docs gen-docs build-docs clean
+.PHONY: docs build-docs clean
 
-docs: gen-docs build-docs
-
-gen-docs:
-	uv run sphinx-apidoc -f -o docs/source ./generic
+docs: build-docs
 
 build-docs:
 	uv run sphinx-build -b html docs/source docs/build
 
 clean:
-	rm -rf docs/build
+	rm -rf docs/build docs/source/apidocs

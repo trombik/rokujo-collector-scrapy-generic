@@ -18,10 +18,6 @@ The above command will crawl the URL, skip the landing page, crawl all the pages
 
 The human-friendly name of the spider is `read-more`. `urls` is a mandatory argument, a comma-separated list of URLs. `-O` option tells the spider to create, or overwrite, a JSONL file and store the collected `ArticleItem` in it. To append new article to the JSONL later, use `-o foo.jsonl`, which appends `ArticleItem` instead of overwriting the file.
 
-```{note}
-Be sure to quote the argument of `-a` option.
-```
-
 To see the result in the file, open it with a text editor, or use [jq](https://jqlang.org/).
 
 ```console

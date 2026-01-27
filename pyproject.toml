@@ -39,5 +39,6 @@ dev = [
     "pytest-mock>=3.15.1",
     "ruff>=0.14.11",
     "sphinx>=9.0.4",
+    "sphinx-autodoc2>=0.5.0",
     "sphinxcontrib-mermaid>=2.0.0",
 ]

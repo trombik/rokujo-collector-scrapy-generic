@@ -11,10 +11,3 @@ Use cases:
 * Create a database of commonly used technical terms by experts.
 
 In addition, some spiders collect files, linked from pages, such as PDF.
-
-## Available spiders
-
-* [ReadMoreSpider](/spiders/ReadMoreSpider.md)
-    Parses pages and collects texts.
-* [FileDownloadSpider](spiders/FileDownloadSpider.md)
-    Crawls pages under a specific path in websites and collects files, such as PDF files.

@@ -5,7 +5,7 @@ This project provides a generic Scrapy framework for collecting data from Rokujo
 It includes pre-configured spiders, pipelines, and settings to streamline the data collection process.
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: Contents:
 
 introduction

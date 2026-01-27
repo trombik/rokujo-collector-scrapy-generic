@@ -65,4 +65,4 @@ When no more `read_next` link is found, the spider looks for links to source art
 
 When no source link is found, it finishes crawling.
 
-When it finishes crawling and scraping article texts, it generates [ArticleItem], an object that represents an article. The `ArticleItem` has an attribute, `body`, which includes all the texts from the article, among other metadata attributes. The object can be exported to a file, such as JSONL or CSV files.
+When it finishes crawling and scraping article texts, it generates [ArticleItem](generic.items.ArticleItem), an object that represents an article. The `ArticleItem` has an attribute, `body`, which includes all the texts from the article, among other metadata attributes. The object can be exported to a file, such as JSONL or CSV files.

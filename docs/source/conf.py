@@ -20,16 +20,19 @@ source_suffix = {
 
 myst_enable_extensions = [
     "colon_fence",
+    "substitution",
 ]
 
 autodoc2_packages = [
     {
-        "path": "../../generic/",
+        "path": "../../generic",
         "auto_mode": True,
+        "exclude_dirs": [
+        ]
     },
 ]
 autodoc2_docstring_parser_type = "google"
-autodoc2_render_plugin = "myst"
+autodoc2_render_plugin = "rst"
 
 html_theme = "pydata_sphinx_theme"
 html_css_files = [

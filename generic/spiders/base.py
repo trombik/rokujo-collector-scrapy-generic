@@ -13,6 +13,9 @@ from generic.utils import idn2ascii
 
 
 class GenericSpiderConfig(BaseModel):
+    """
+    A base config for spiders.
+    """
     urls: Union[HttpUrl, List[HttpUrl]]
     """
     A string of comma-separated URLs or List of URL strings.

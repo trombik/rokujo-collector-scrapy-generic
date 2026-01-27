@@ -3,7 +3,7 @@
 Spiders are programs that crawl websites and collect data.
 They are a fundamental tool in web scraping and data extraction.
 
-Spiders collects some kind of data. Either `ArticleItem` or files.
+Spiders collects some kind of data. Either [ArticleItem](generic.items.ArticleItem) or files.
 
 `ArticleItem` is a structured data such as text and metadata.
 `ArticleItem` has many attributes, including `body`, which is the scraped text from pages, and metadata, such as title of the article page.
@@ -16,6 +16,7 @@ The spiders reside under `generic/spiders`.
 
 spiders/ReadMoreSpider
 spiders/ArchiveSpider
+spiders/FeedSpider
 ```
 
 ## Name
@@ -74,18 +75,20 @@ uv run scrapy crawl -a "urls=http://example.net/" -a "arg=value2" read-more
 
 ## Output options
 
-Spiders that collects `ArticleItem` and exports the items in various format.
+Spiders that collects `ArticleItem` can export the items in various format.
 JSONL is the most recommended one.
 `-O` and `-o` option specify the output file name and the format.
 `-O` overwrites the specified file with the collected items while `-o` appends new items to the file.
 
 ```console
 # -O overwrites and delete old items in the file
-uv run scrapy crawl -a "urls=http://example.org/" -O items.jsonl ead-more
+uv run scrapy crawl -a "urls=http://example.org/" -O items.jsonl read-more
 
 # -o appends new items, preserving the existing items in the file
-uv run scrapy crawl -a "urls=http://example.org/" -o items.jsonl ead-more
+uv run scrapy crawl -a "urls=http://example.org/" -o items.jsonl read-more
 
 # scrapy supports CSV format, too
-uv run scrapy crawl -a "urls=http://example.org/" -o items.csv ead-more
+uv run scrapy crawl -a "urls=http://example.org/" -o items.csv read-more
 ```
+
+Spiders that collects files requires `output_dir` argument.

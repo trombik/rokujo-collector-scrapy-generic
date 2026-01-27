@@ -11,12 +11,18 @@ from generic.spiders.base import GenericSpider, GenericSpiderConfig
 
 
 class FeedEntry(BaseModel):
+    """
+    A class for internal use.
+    """
     id: str
     title: str
     link: str
 
 
 class Feed(BaseModel):
+    """
+    A class for internal use.
+    """
     id: str
     """
     The URL of the page.
@@ -37,49 +43,61 @@ class Feed(BaseModel):
 
 class FeedConfig(BaseModel):
     """
-    Configuration for FeedSpider.
+    The YAML configuration file format.
 
-    Use a YAML file for configuration. Specify the path with
-    `-a /path/to/config.yml`. Default is `feed.yml`.
+    .. code-block:: yaml
 
-    The top-level key must be `feed_config`.
+        ---
+        feed_config:
+          "http://foo.example.org/latest.html":
+            file_name: "latest.xml"
+            feed_type: "atom"
+            xpath_href: "//li[@class='articles-list__item']/a/@href"
+            xpath_title: "//li[@class='articles-list__item']/a/text()"
 
-    `feed_config` is a dictionary. The key is the page URL for the feed. The
-    value is a dictionary with `file_name`, `feed_type`, `xpath_href`, and
-    `xpath_title`.
+    The top-level key must be ``feed_config``.
 
-    `file_name`: The name of the generated feed file. This must be unique per
-                 URL. The file is overwritten when a feed is generated.
-
-    `xpath_title` is the path to the feed title.
-
-    `xpath_href` is the path to the `href` attribute of the link.
-
-    `feed_type` is either `atom` or `rss`.
-
-    Example:
-
-    ```yaml
-    ---
-    feed_config:
-      "http://foo.example.org/latest.html":
-        file_name: "latest.xml"
-        feed_type: "atom"
-        xpath_href: "//li[@class='articles-list__item']/a/@href"
-        xpath_title: "//li[@class='articles-list__item']/a/text()"
-    ```
-
+    ``feed_config`` is a dictionary. The key is the page URL for the feed. The
+    value is a dictionary with ``file_name``, ``feed_type``, ``xpath_href``,
+    and ``xpath_title``.
     """
 
     file_name: str
+    """
+    The name of the generated feed file. This must be unique per URL. The file
+    is overwritten when a feed is generated.
+    """
     xpath_href: str
+    """
+    The path to the ``href`` attribute of the link.
+    """
+
     xpath_title: str
+    """
+    The path to the feed title.
+    """
     feed_type: str = "atom"
+    """
+    Type of the feed. Either ``atom`` or ``rss``.
+    """
 
 
 class FeedSpiderConfig(GenericSpiderConfig):
+    """
+    Configuration for FeedSpider.
+
+    Unlike other spiders, this spider does not accept ``urls``. Instead, it
+    requires ``config``, e.g., ``-a config=/path/to/config.yml`` and
+    the configuration file defines feeds to generate.
+    """
     feed_config: dict[str, FeedConfig]
+    """
+    Foo
+    """
     config: Path
+    """
+    The path to the configuration file.
+    """
 
 
 class FeedSpider(GenericSpider[FeedSpiderConfig]):

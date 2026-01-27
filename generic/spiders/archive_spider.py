@@ -10,20 +10,20 @@ from generic.spiders.read_more import ReadMoreSpiderConfig
 class ArchiveSpiderConfig(ReadMoreSpiderConfig):
     """
     A spider configuration class for ArchiveSpider.
-
-    Attributes:
-        archive_article_xpath (Optional[str]):
-            XPath expression to extract article links from the archive page.
-        archive_next_xpath (Optional[str]):
-            XPath expression to extract the link to the next archive page.
     """
 
     archive_article_xpath: Optional[str] = (
         "//main//li[@class!=' pr']//h2[@class='title']//a/@href"
     )
+    """
+    XPath expression to extract article links from the archive page.
+    """
     archive_next_xpath: Optional[str] = (
         "//div[contains(@class, 'pagination')]//a[contains(text(), '次へ')]/@href"  # noqa E501
     )
+    """
+    XPath expression to extract a next archive link from the archive page.
+    """
     pass
 
 

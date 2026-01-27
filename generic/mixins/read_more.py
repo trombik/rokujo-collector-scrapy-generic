@@ -14,8 +14,17 @@ class ReadMoreCompatible(Protocol):
 
 class ReadMoreMixinConfig(GenericSpiderConfig):
     read_more: str = "記事全文を読む"
+    """
+    The text of ``<a>`` tag, the link to the main article.
+    """
     read_more_xpath: Optional[str] = None
+    """
+    XPath expression that matches the link to the main article.
+    """
     read_next: str = "次へ"
+    """
+    The text of ``<a>`` tag, the link to the next page.
+    """
     read_next_contains: Optional[str] = None
     source_contains: Optional[str] = None
     source_parent_contains: Optional[str] = None

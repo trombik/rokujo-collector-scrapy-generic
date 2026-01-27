@@ -68,13 +68,6 @@ uv run scrapy crawl -a'urls=https://rubyonrails.org/blog/' \
     -O foo.jsonl archive
 ```
 
-## Arguments
-
-```{autodoc2-object} generic.spiders.archive_spider.ArchiveSpiderConfig
-render_plugin = "myst"
-no_index = true
-```
-
 ## How It Works
 
 

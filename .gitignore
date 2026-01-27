@@ -17,7 +17,7 @@ wheels/
 # default output files for development
 /foo.*
 
-/docs/source/*.rst
+/docs/source/apidocs/
 !/docs/source/index.rst
 !/docs/source/**/*.md
 !/docs/source/conf.py

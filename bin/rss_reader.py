@@ -143,24 +143,29 @@ if __name__ == "__main__":
                 entry.link for entry in unread_entries if entry.link
             ]
             logger.info(f"Found {len(urls_to_process)} unread entries.")
+            file = filename_with_unix_timestamp(args.output)
+            logger.debug(f"Adding entries to {file}")
+            tmp_file = create_tmp_file(file)
+            logger.debug(f"tmp_file: {tmp_file}")
             for cmd in group_urls_to_commands(urls_to_process, rss_config):
-                file = filename_with_unix_timestamp(args.output)
-                logger.debug(f"Adding entries to {file}")
-                tmp_file = create_tmp_file(file)
                 cmd.extend(["-o", tmp_file])
                 cmd.extend(["--loglevel", args.loglevel.upper()])
                 try:
                     run_spider(cmd)
-                    if (
-                        os.path.exists(tmp_file)
-                        and os.path.getsize(tmp_file) > 0
-                    ):
-                        os.rename(tmp_file, file)
                 except Exception as e:
                     logger.error(e)
-                finally:
-                    if os.path.exists(tmp_file):
-                        os.remove(tmp_file)
+            logger.debug(f"Moving {tmp_file} to {file}")
+            try:
+                if (
+                    os.path.exists(tmp_file)
+                    and os.path.getsize(tmp_file) > 0
+                ):
+                    os.rename(tmp_file, file)
+            except Exception as e:
+                logger.error(e)
+            finally:
+                if os.path.exists(tmp_file):
+                    os.remove(tmp_file)
 
             for entry in unread_entries:
                 reader.mark_entry_as_read(entry)

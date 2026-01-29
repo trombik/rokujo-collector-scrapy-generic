@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 import re
 import subprocess
@@ -40,15 +41,11 @@ def group_urls_to_commands(
 def run_spider(cmd):
     if cmd is None:
         return
-
-    try:
-        subprocess.run(cmd)
-    except subprocess.CalledProcessError as e:
-        print(f"Spider execution failed: {e}")
+    subprocess.run(cmd)
 
 
-def update_feeds_with_feed_spider():
-    cmd = ["scrapy", "crawl", "feed"]
+def update_feeds_with_feed_spider(loglevel: str):
+    cmd = ["scrapy", "crawl", f"--loglevel={loglevel.upper()}", "feed"]
     run_spider(cmd)
 
 
@@ -80,6 +77,13 @@ def parse_args():
     parser.add_argument(
         "-o", "--output", default="rss.jsonl", help="Path to output JSONL file"
     )
+    parser.add_argument(
+        "-l",
+        "--loglevel",
+        default="info",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Log level, one of choices in upper case or lower case",
+    )
     return parser.parse_args()
 
 
@@ -96,8 +100,19 @@ def create_tmp_file(target_path: str) -> str:
     return tmp_path
 
 
+def create_logger(log_level: str):
+    level = getattr(logging, log_level.upper(), logging.INFO)
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    return logging.getLogger("rss_reader")
+
+
 if __name__ == "__main__":
     args = parse_args()
+    logger = create_logger(args.loglevel)
     conf = load_config(args.config)
 
     reader = make_reader(
@@ -107,21 +122,27 @@ if __name__ == "__main__":
     for url in conf.get("feed_urls"):
         reader.add_feed(url, exist_ok=True)
 
-    print(f"Starting RSS monitor. Interval: {args.interval} min.")
+    logger.info(f"Starting RSS monitor. Interval: {args.interval} min.")
     while True:
-        update_feeds_with_feed_spider()
-        print("Checking for new entries...")
+        try:
+            update_feeds_with_feed_spider(loglevel=args.loglevel)
+        except Exception as e:
+            logger.error(e)
+
+        logger.info("Checking for new entries...")
         reader.update_feeds()
         unread_entries = list(reader.get_entries(read=False))
         if unread_entries:
             urls_to_process = [
                 entry.link for entry in unread_entries if entry.link
             ]
-            print(f"Found {len(urls_to_process)} unread entries.")
+            logger.info(f"Found {len(urls_to_process)} unread entries.")
             for cmd in group_urls_to_commands(urls_to_process, conf):
                 file = filename_with_unix_timestamp(args.output)
+                logger.debug(f"Adding entries to {file}")
                 tmp_file = create_tmp_file(file)
                 cmd.extend(["-o", tmp_file])
+                cmd.extend(["--loglevel", args.logleve.upper()])
                 try:
                     run_spider(cmd)
                     if (
@@ -129,6 +150,8 @@ if __name__ == "__main__":
                         and os.path.getsize(tmp_file) > 0
                     ):
                         os.rename(tmp_file, file)
+                except Exception as e:
+                    logger.error(e)
                 finally:
                     if os.path.exists(tmp_file):
                         os.remove(tmp_file)
@@ -136,7 +159,7 @@ if __name__ == "__main__":
             for entry in unread_entries:
                 reader.mark_entry_as_read(entry)
         else:
-            print("No new unread entries.")
+            logger.info("No new unread entries.")
 
-        print(f"Sleeping for {args.interval} minutes...")
+        logger.info(f"Sleeping for {args.interval} minutes...")
         time.sleep(args.interval * 60)

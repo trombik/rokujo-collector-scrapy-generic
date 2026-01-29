@@ -49,7 +49,7 @@ def update_feeds_with_feed_spider(loglevel: str):
     run_spider(cmd)
 
 
-def load_config(path):
+def load_rss_config(path):
     with open(path, "r") as f:
         config = yaml.safe_load(f)
     return config
@@ -110,20 +110,25 @@ def create_logger(log_level: str):
     return logging.getLogger("rss_reader")
 
 
+def update_feed_urls(reader, urls: list[str]):
+    for url in urls:
+        reader.add_feed(url, exist_ok=True)
+
+
 if __name__ == "__main__":
     args = parse_args()
     logger = create_logger(args.loglevel)
-    conf = load_config(args.config)
+    rss_config = load_rss_config(args.config)
 
     reader = make_reader(
         url=args.database,
         feed_root="",
     )
-    for url in conf.get("feed_urls"):
-        reader.add_feed(url, exist_ok=True)
 
     logger.info(f"Starting RSS monitor. Interval: {args.interval} min.")
     while True:
+        update_feed_urls(reader, rss_config.get("feed_urls"))
+
         try:
             update_feeds_with_feed_spider(loglevel=args.loglevel)
         except Exception as e:
@@ -137,12 +142,12 @@ if __name__ == "__main__":
                 entry.link for entry in unread_entries if entry.link
             ]
             logger.info(f"Found {len(urls_to_process)} unread entries.")
-            for cmd in group_urls_to_commands(urls_to_process, conf):
+            for cmd in group_urls_to_commands(urls_to_process, rss_config):
                 file = filename_with_unix_timestamp(args.output)
                 logger.debug(f"Adding entries to {file}")
                 tmp_file = create_tmp_file(file)
                 cmd.extend(["-o", tmp_file])
-                cmd.extend(["--loglevel", args.logleve.upper()])
+                cmd.extend(["--loglevel", args.loglevel.upper()])
                 try:
                     run_spider(cmd)
                     if (

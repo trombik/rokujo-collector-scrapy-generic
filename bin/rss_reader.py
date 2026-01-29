@@ -1,9 +1,11 @@
+import argparse
 import re
 import subprocess
 import time
 from collections import defaultdict
 from typing import Any
 
+import yaml
 from reader import make_reader
 
 
@@ -52,23 +54,51 @@ def update_feeds_with_feed_spider():
     run_spider(cmd)
 
 
-INTERVAL_SECONDS = 15 * 60
-DB_PATH = "db/rss_reader.db"
+def load_config(path):
+    with open(path, "r") as f:
+        config = yaml.safe_load(f)
+    return config
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Simple RSS reader for rokujo-collector-scrapy"
+    )
+    parser.add_argument(
+        "-c", "--config",
+        default="rss.yml",
+        help="Path to RSS feed configuration file"
+    )
+    parser.add_argument(
+        "-i", "--interval",
+        default=15,
+        help="Update interval in minutes"
+    )
+    parser.add_argument(
+        "-d", "--database",
+        default="db/rss_reader.db",
+        help="Path to RSS feed database"
+    )
+    parser.add_argument(
+        "-o", "--output",
+        default="rss.jsonl",
+        help="Path to output JSONL file"
+    )
+    return parser.parse_args()
+
 
 if __name__ == "__main__":
-    import yaml
-
-    with open("rss.yml", "r") as f:
-        conf = yaml.safe_load(f)
+    args = parse_args()
+    conf = load_config(args.config)
 
     reader = make_reader(
-        url=DB_PATH,
+        url=args.database,
         feed_root="",
     )
     for url in conf.get("feed_urls"):
         reader.add_feed(url, exist_ok=True)
 
-    print(f"Starting RSS monitor. Interval: {INTERVAL_SECONDS / 60} min.")
+    print(f"Starting RSS monitor. Interval: {args.interval} min.")
     while True:
         update_feeds_with_feed_spider()
         print("Checking for new entries...")
@@ -80,7 +110,7 @@ if __name__ == "__main__":
             ]
             print(f"Found {len(urls_to_process)} unread entries.")
             for cmd in group_urls_to_commands(urls_to_process, conf):
-                cmd.extend(["-o", "rss.jsonl"])
+                cmd.extend(["-o", args.output])
                 run_spider(cmd)
 
             for entry in unread_entries:
@@ -88,5 +118,5 @@ if __name__ == "__main__":
         else:
             print("No new unread entries.")
 
-        print(f"Sleeping for {INTERVAL_SECONDS / 60} minutes...")
-        time.sleep(INTERVAL_SECONDS)
+        print(f"Sleeping for {args.interval} minutes...")
+        time.sleep(args.interval * 60)

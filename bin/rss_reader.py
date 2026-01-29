@@ -1,6 +1,8 @@
 import argparse
+import os
 import re
 import subprocess
+import tempfile
 import time
 from collections import defaultdict
 from typing import Any
@@ -46,11 +48,7 @@ def run_spider(cmd):
 
 
 def update_feeds_with_feed_spider():
-    cmd = [
-        "scrapy",
-        "crawl",
-        "feed"
-    ]
+    cmd = ["scrapy", "crawl", "feed"]
     run_spider(cmd)
 
 
@@ -65,26 +63,37 @@ def parse_args():
         description="Simple RSS reader for rokujo-collector-scrapy"
     )
     parser.add_argument(
-        "-c", "--config",
+        "-c",
+        "--config",
         default="rss.yml",
-        help="Path to RSS feed configuration file"
+        help="Path to RSS feed configuration file",
     )
     parser.add_argument(
-        "-i", "--interval",
-        default=15,
-        help="Update interval in minutes"
+        "-i", "--interval", default=15, help="Update interval in minutes"
     )
     parser.add_argument(
-        "-d", "--database",
+        "-d",
+        "--database",
         default="db/rss_reader.db",
-        help="Path to RSS feed database"
+        help="Path to RSS feed database",
     )
     parser.add_argument(
-        "-o", "--output",
-        default="rss.jsonl",
-        help="Path to output JSONL file"
+        "-o", "--output", default="rss.jsonl", help="Path to output JSONL file"
     )
     return parser.parse_args()
+
+
+def filename_with_unix_timestamp(path: str) -> str:
+    unix_timestamp = int(time.time())
+    base, ext = os.path.splitext(path)
+    return f"{base}-{unix_timestamp}{ext}"
+
+
+def create_tmp_file(target_path: str) -> str:
+    directory = os.path.dirname(os.path.abspath(target_path))
+    fd, tmp_path = tempfile.mkstemp(dir=directory, suffix=".tmp")
+    os.close(fd)
+    return tmp_path
 
 
 if __name__ == "__main__":
@@ -110,8 +119,19 @@ if __name__ == "__main__":
             ]
             print(f"Found {len(urls_to_process)} unread entries.")
             for cmd in group_urls_to_commands(urls_to_process, conf):
-                cmd.extend(["-o", args.output])
-                run_spider(cmd)
+                file = filename_with_unix_timestamp(args.output)
+                tmp_file = create_tmp_file(file)
+                cmd.extend(["-o", tmp_file])
+                try:
+                    run_spider(cmd)
+                    if (
+                        os.path.exists(tmp_file)
+                        and os.path.getsize(tmp_file) > 0
+                    ):
+                        os.rename(tmp_file, file)
+                finally:
+                    if os.path.exists(tmp_file):
+                        os.remove(tmp_file)
 
             for entry in unread_entries:
                 reader.mark_entry_as_read(entry)

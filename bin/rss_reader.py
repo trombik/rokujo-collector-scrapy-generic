@@ -95,7 +95,8 @@ def filename_with_unix_timestamp(path: str) -> str:
 
 def create_tmp_file(target_path: str) -> str:
     directory = os.path.dirname(os.path.abspath(target_path))
-    fd, tmp_path = tempfile.mkstemp(dir=directory, suffix=".tmp")
+    _base, ext = os.path.splitext(target_path)
+    fd, tmp_path = tempfile.mkstemp(dir=directory, suffix=f".tmp{ext}")
     os.close(fd)
     return tmp_path
 

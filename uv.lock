@@ -419,6 +419,15 @@ wheels = [
 ]
 
 [[package]]
+name = "curl-cffi"
+version = "0.15.0b1"
+source = { git = "https://github.com/trombik/curl_cffi.git?rev=freebsd#7ba7fb48fac88784c9d5dd67f1c0b8571bd9b256" }
+dependencies = [
+    { name = "certifi" },
+    { name = "cffi" },
+]
+
+[[package]]
 name = "dateparser"
 version = "1.2.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1941,6 +1950,7 @@ name = "rokujo-collector-scrapy-generic"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "curl-cffi" },
     { name = "extruct" },
     { name = "feedgen" },
     { name = "pathvalidate" },
@@ -1949,6 +1959,7 @@ dependencies = [
     { name = "pyyaml" },
     { name = "reader" },
     { name = "scrapy" },
+    { name = "scrapy-impersonate" },
     { name = "scrapy-spider-metadata" },
     { name = "scrapy-user-agents" },
     { name = "trafilatura", extra = ["all"] },
@@ -1971,6 +1982,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "curl-cffi", git = "https://github.com/trombik/curl_cffi.git?rev=freebsd" },
     { name = "extruct", specifier = ">=0.18.0" },
     { name = "feedgen", specifier = ">=1.0.0" },
     { name = "pathvalidate", specifier = ">=3.3.1" },
@@ -1979,6 +1991,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "reader", specifier = ">=3.21" },
     { name = "scrapy", specifier = ">=2.14.0" },
+    { name = "scrapy-impersonate", git = "https://github.com/trombik/scrapy-impersonate.git?rev=freebsd" },
     { name = "scrapy-spider-metadata", specifier = ">=0.2.0" },
     { name = "scrapy-user-agents", specifier = ">=0.1.1" },
     { name = "trafilatura", extras = ["all"], specifier = ">=2.0.0" },
@@ -2060,6 +2073,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/03/05/db301a334044577e2f341b19631229aae06f4664dc4c6c3c6246b4081872/scrapy-2.14.0.tar.gz", hash = "sha256:5df8326d9bffc90a719c4579b80195fc0b3c85a0503c73e0f75a5c582da4c064", size = 1251119, upload-time = "2026-01-05T10:07:20.247Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1e/df/de19380166194b9b88e452b7f3074c160be3884531a718ada7ee1cf7e24d/scrapy-2.14.0-py3-none-any.whl", hash = "sha256:7914d52dfa6d336ce72ffb57631d8843c556ea9f957352df135defdbdaa351a8", size = 331451, upload-time = "2026-01-05T10:07:18.053Z" },
+]
+
+[[package]]
+name = "scrapy-impersonate"
+version = "1.6.2"
+source = { git = "https://github.com/trombik/scrapy-impersonate.git?rev=freebsd#249dca120a0cd154d37411d85dd8e181be19bfb8" }
+dependencies = [
+    { name = "curl-cffi" },
+    { name = "scrapy" },
 ]
 
 [[package]]

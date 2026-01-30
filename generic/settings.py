@@ -14,7 +14,7 @@ NEWSPIDER_MODULE = "generic.spiders"
 
 ADDONS = {}
 
-
+USER_AGENT = ""
 # Crawl responsibly by identifying yourself (and your website) on the
 # user-agent USER_AGENT = "generic (+http://www.yourdomain.com)"
 
@@ -49,8 +49,12 @@ DOWNLOAD_DELAY = 3
 
 DOWNLOADER_MIDDLEWARES = {
     "scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware": 543,
-    "scrapy.downloadermiddlewares.useragent.UserAgentMiddleware": None,
-    "scrapy_user_agents.middlewares.RandomUserAgentMiddleware": 400,
+    "scrapy_impersonate.RandomBrowserMiddleware": 1000,
+}
+
+DOWNLOAD_HANDLERS = {
+    "http": "scrapy_impersonate.ImpersonateDownloadHandler",
+    "https": "scrapy_impersonate.ImpersonateDownloadHandler",
 }
 
 # Enable or disable extensions

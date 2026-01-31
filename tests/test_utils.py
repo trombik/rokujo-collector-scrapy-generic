@@ -5,6 +5,7 @@ import pytest
 
 from generic.utils import (
     generate_hashed_filename,
+    get_url_without_fragment,
     is_file_url,
     is_path_matched,
 )
@@ -140,3 +141,36 @@ class TestIsFileUrl:
     )
     def test_is_file_url(self, url, expected_is_file):
         assert is_file_url(url) == expected_is_file
+
+
+class GetUrlWithoutFragment:
+    @pytest.mark.parametrize(
+        "input_url, expected",
+        [
+            (
+                "https://example.org/page#main-article",
+                "https://example.org/page",
+            ),
+            ("https://example.org/page#section-1", "https://example.org/page"),
+            (
+                "https://example.org/page?query=1#hash",
+                "https://example.org/page?query=1",
+            ),
+            ("https://example.org/page", "https://example.org/page"),
+            ("", ""),
+        ],
+    )
+    def test_get_unique_url(self, input_url, expected):
+        assert get_url_without_fragment(input_url) == expected
+
+    def test_url_uniqueness_with_set(self):
+        """複数の実質的に同じURLが、setによって1つに集約されることをテスト"""
+        urls = [
+            "https://example.org/article/1#intro",
+            "https://example.org/article/1#main",
+            "https://example.org/article/1",
+        ]
+        unique_urls = {get_url_without_fragment(u) for u in urls}
+
+        assert len(unique_urls) == 1
+        assert list(unique_urls)[0] == "https://example.org/article/1"

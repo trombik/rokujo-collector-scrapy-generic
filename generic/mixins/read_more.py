@@ -156,7 +156,7 @@ class ReadMoreMixin:
                 f"Searching read_more with: {self.args.read_more}"
             )
             return res.xpath(
-                "//a[text()=$text]/@href", text=self.args.read_more
+                "//a[contains(., $text)]/@href", text=self.args.read_more
             ).get()
 
     def _find_next_page_link(

@@ -5,6 +5,7 @@ from lxml import etree
 
 from generic.items import ArticleItem
 from generic.spiders.base import GenericSpiderConfig
+from generic.utils import get_url_without_fragment
 
 
 class ReadMoreCompatible(Protocol):
@@ -155,7 +156,7 @@ class ReadMoreMixin:
                 f"Searching read_more with: {self.args.read_more}"
             )
             return res.xpath(
-                "//a[text()=$text]/@href", text=self.args.read_more
+                "//a[contains(., $text)]/@href", text=self.args.read_more
             ).get()
 
     def _find_next_page_link(
@@ -281,7 +282,9 @@ class ReadMoreMixin:
             query = "//a[contains(., $arg)]/@href"
             arg = self.args.source_contains
         elif self.args.source_parent_contains:
-            query = "//a[contains(parent::*, $arg)]/@href"
+            # Matches <a> tags where an ancestor within 2 levels contains
+            # specific text.
+            query = "//a[ancestor::*[position() <= 2][contains(text(), $arg)]]/@href"  # noqa E501
             arg = self.args.source_parent_contains
         # no options for sources. yield item and finish.
         if not query:
@@ -292,7 +295,9 @@ class ReadMoreMixin:
 
         # ensure URLs are absolute.
         source_urls = [res.urljoin(href) for href in source_hrefs]
-        return list(dict.fromkeys(source_urls))
+        # and they are unique
+        uniq_urls = list(set(get_url_without_fragment(u) for u in source_urls))
+        return uniq_urls
 
     def _find_and_request_sources(
         self, res: scrapy.http.Response, item: ArticleItem

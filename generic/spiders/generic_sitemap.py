@@ -9,13 +9,13 @@ from generic.spiders.base import GenericSpider
 from generic.utils import idn2ascii
 
 
-class WordPressSpiderConfig(ReadMoreMixinConfig):
+class GenericSitemapSpiderConfig(ReadMoreMixinConfig):
     pass
 
 
-class WordPressSpider(
+class GenericSitemapSpider(
     SitemapSpider,
-    GenericSpider[WordPressSpiderConfig],
+    GenericSpider[GenericSitemapSpiderConfig],
     ReadMoreMixin,
 ):
     """
@@ -26,15 +26,15 @@ class WordPressSpider(
     multiple pages (and implements other goodies like scraping sources).
     """
 
-    name = "wordpress"
+    name = "sitemap"
     custom_settings = {}
 
     @classmethod
-    def get_config_class(cls) -> Type[WordPressSpiderConfig]:
+    def get_config_class(cls) -> Type[GenericSitemapSpiderConfig]:
         """
         Returns the config class for this spider.
         """
-        return WordPressSpiderConfig
+        return GenericSitemapSpiderConfig
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

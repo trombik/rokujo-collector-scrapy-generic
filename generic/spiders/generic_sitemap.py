@@ -1,29 +1,35 @@
+import re
 from typing import Type
 from urllib.parse import urljoin, urlparse
 
 from scrapy.http import Response
 from scrapy.spiders import SitemapSpider
 
-from generic.mixins.read_more import ReadMoreMixin, ReadMoreMixinConfig
-from generic.spiders.base import GenericSpider
+from generic.items import ArticleItem
+from generic.spiders.base import GenericSpider, GenericSpiderConfig
 from generic.utils import idn2ascii
 
 
-class GenericSitemapSpiderConfig(ReadMoreMixinConfig):
-    pass
+class GenericSitemapSpiderConfig(GenericSpiderConfig):
+    sitemap_type: str = "all"
+    """
+    The option rejects certain URLs to sitemap XML files, such as archive,
+    author, etc.
+
+    "all" rejects nothing. This is the default.
+
+    "wordpress" rejects certain known URLs which point to index pages of tags,
+    authors, and taxonomy.
+    """
 
 
 class GenericSitemapSpider(
     SitemapSpider,
-    GenericSpider[GenericSitemapSpiderConfig],
-    ReadMoreMixin,
+    GenericSpider[GenericSitemapSpiderConfig]
 ):
     """
     A spider that scrapes all the articles within a sitemap.xml. The
     sitemap.xml may contain another sitemap.xml (nested sitemap.xml).
-
-    The spider uses ReadMoreMixin and automatically scrapes articles of
-    multiple pages (and implements other goodies like scraping sources).
     """
 
     name = "sitemap"
@@ -50,8 +56,41 @@ class GenericSitemapSpider(
         self.logger.debug(f"allowed_domains: {self.allowed_domains}")
 
     def sitemap_filter(self, entries):
+        match self.args.sitemap_type:
+            case "wordpress":
+                self.logger.debug("sitemap_filter: wordpress")
+                yield from self.sitemap_filter_wordpress(entries)
+            case "all":
+                self.logger.debug("sitemap_filter: all")
+                yield from self.sitemap_filter_all(entries)
+            case _:
+                self.logger.error(
+                    f"Unknown sitemap_type: {self.args.sitemap_type}"
+                )
+                self.logger.warn(
+                    "yielding all the entries."
+                )
+                yield from self.sitemap_filter_all(entries)
+
+    def sitemap_filter_all(self, entries):
         for entry in entries:
             yield entry
 
+    def sitemap_filter_wordpress(self, entries):
+        deny_patterns = [
+            # general patterns
+            re.compile(r"(?:taxonomy|author|category|archive)-.*\.xml"),
+            # Yoast SEO
+            re.compile(r"(?:post_tag|post_format)-.*\.xml"),
+        ]
+        for entry in entries:
+            loc = entry.get("loc", "")
+            if any(pattern.search(loc) for pattern in deny_patterns):
+                self.logger.debug(f"Ignoring a sitemap.xml {loc}")
+                continue
+            else:
+                self.logger.debug(f"Yielding a sitemap.xml {loc}")
+                yield entry
+
     def parse(self, response: Response):
-        yield from self.parse_summary_page(response)
+        return ArticleItem.from_response(response)

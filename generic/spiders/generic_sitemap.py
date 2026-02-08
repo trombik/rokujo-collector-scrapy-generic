@@ -79,7 +79,7 @@ class GenericSitemapSpider(
     def sitemap_filter_wordpress(self, entries):
         deny_patterns = [
             # general patterns
-            re.compile(r"(?:taxonomy|author|category|archive)-.*\.xml"),
+            re.compile(r"(?:taxonomy|taxonomies|author|category|archive)-.*\.xml"), # noqa E501
             # Yoast SEO
             re.compile(r"(?:post_tag|post_format)-.*\.xml"),
         ]

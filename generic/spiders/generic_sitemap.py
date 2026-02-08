@@ -24,8 +24,7 @@ class GenericSitemapSpiderConfig(GenericSpiderConfig):
 
 
 class GenericSitemapSpider(
-    SitemapSpider,
-    GenericSpider[GenericSitemapSpiderConfig]
+    SitemapSpider, GenericSpider[GenericSitemapSpiderConfig]
 ):
     """
     A spider that scrapes all the articles within a sitemap.xml. The
@@ -67,15 +66,11 @@ class GenericSitemapSpider(
                 self.logger.error(
                     f"Unknown sitemap_type: {self.args.sitemap_type}"
                 )
-                self.logger.warn(
-                    "yielding all the entries."
-                )
+                self.logger.warn("yielding all the entries.")
                 yield from self.sitemap_filter_all(entries)
 
     def sitemap_filter_all(self, entries):
-        default_deny_patters = [
-            re.compile(r"\.(pdf|docx)$", re.IGNORECASE)
-        ]
+        default_deny_patters = [re.compile(r"\.(pdf|docx)$", re.IGNORECASE)]
         for entry in entries:
             loc = entry.get("loc", "")
             if any(pattern.search(loc) for pattern in default_deny_patters):
@@ -86,7 +81,9 @@ class GenericSitemapSpider(
     def sitemap_filter_wordpress(self, entries):
         deny_patterns = [
             # general patterns
-            re.compile(r"(?:taxonomy|taxonomies|author|category|archive)-.*\.xml"), # noqa E501
+            re.compile(
+                r"(?:taxonomy|taxonomies|author|category|archive)-.*\.xml"
+            ),  # noqa E501
             # Yoast SEO
             re.compile(r"(?:post_tag|post_format)-.*\.xml"),
         ]
@@ -101,9 +98,9 @@ class GenericSitemapSpider(
                 yield entry
 
     def parse(self, response: Response):
-        content_type = response.headers.get(
-            "Content-Type", b""
-        ).decode("utf-8").lower()
+        content_type = (
+            response.headers.get("Content-Type", b"").decode("utf-8").lower()
+        )
         if "text/html" not in content_type:
             self.logger.debug(
                 f"Skipping non-HTML content: {response.url} ({content_type})"

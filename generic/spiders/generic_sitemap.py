@@ -73,7 +73,14 @@ class GenericSitemapSpider(
                 yield from self.sitemap_filter_all(entries)
 
     def sitemap_filter_all(self, entries):
+        default_deny_patters = [
+            re.compile(r"\.(pdf|docx)$", re.IGNORECASE)
+        ]
         for entry in entries:
+            loc = entry.get("loc", "")
+            if any(pattern.search(loc) for pattern in default_deny_patters):
+                self.logger.debug(f"Ignoring a sitemap URL: {loc}")
+                continue
             yield entry
 
     def sitemap_filter_wordpress(self, entries):
@@ -83,6 +90,7 @@ class GenericSitemapSpider(
             # Yoast SEO
             re.compile(r"(?:post_tag|post_format)-.*\.xml"),
         ]
+        entries = self.sitemap_filter_all(entries)
         for entry in entries:
             loc = entry.get("loc", "")
             if any(pattern.search(loc) for pattern in deny_patterns):
@@ -93,4 +101,12 @@ class GenericSitemapSpider(
                 yield entry
 
     def parse(self, response: Response):
+        content_type = response.headers.get(
+            "Content-Type", b""
+        ).decode("utf-8").lower()
+        if "text/html" not in content_type:
+            self.logger.debug(
+                f"Skipping non-HTML content: {response.url} ({content_type})"
+            )
+            return
         return ArticleItem.from_response(response)

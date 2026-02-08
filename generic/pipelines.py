@@ -154,9 +154,9 @@ class FileItemPipeline:
 
                 meta = adapter.get("metadata")
                 if meta:
-                    pdf.docinfo["/AcquiredTime"] = adapter.get(
-                        "acquired_time"
-                    ) or ""
+                    pdf.docinfo["/AcquiredTime"] = (
+                        adapter.get("acquired_time") or ""
+                    )
                     pdf.docinfo["/SourceURL"] = meta.get("url") or ""
                     pdf.docinfo["/SourceSiteName"] = (
                         meta.get("site_name") or ""

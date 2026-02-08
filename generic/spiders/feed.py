@@ -14,6 +14,7 @@ class FeedEntry(BaseModel):
     """
     A class for internal use.
     """
+
     id: str
     title: str
     link: str
@@ -23,6 +24,7 @@ class Feed(BaseModel):
     """
     A class for internal use.
     """
+
     id: str
     """
     The URL of the page.
@@ -90,6 +92,7 @@ class FeedSpiderConfig(GenericSpiderConfig):
     requires ``config``, e.g., ``-a config=/path/to/config.yml`` and
     the configuration file defines feeds to generate.
     """
+
     feed_config: dict[str, FeedConfig]
     """
     Foo

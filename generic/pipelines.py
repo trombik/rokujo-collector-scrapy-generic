@@ -154,6 +154,9 @@ class FileItemPipeline:
 
                 meta = adapter.get("metadata")
                 if meta:
+                    pdf.docinfo["/AcquiredTime"] = adapter.get(
+                        "acquired_time"
+                    ) or ""
                     pdf.docinfo["/SourceURL"] = meta.get("url") or ""
                     pdf.docinfo["/SourceSiteName"] = (
                         meta.get("site_name") or ""
@@ -165,6 +168,7 @@ class FileItemPipeline:
                     pdf.docinfo["/SourceAuthor"] = meta.get("author") or ""
 
                 with pdf.open_metadata() as xmp:
+                    xmp["AcquiredTime"] = adapter.get("acquired_time") or ""
                     xmp["FileURL"] = (adapter.get("url")) or ""
                     xmp["OriginalFilename"] = adapter.get("filename") or ""
 

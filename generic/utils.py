@@ -1,3 +1,5 @@
+from urllib.parse import urlparse, urlunparse
+
 import extruct
 from dateutil import parser
 from scrapy.http import Response
@@ -249,3 +251,11 @@ def is_file_url(
         return False
 
     return not is_path_matched(url, regexp)
+
+
+def get_url_without_fragment(url_string: str) -> str:
+    """
+    Removes fragment from a URL string.
+    """
+    parsed = urlparse(url_string)
+    return urlunparse(parsed._replace(fragment=""))

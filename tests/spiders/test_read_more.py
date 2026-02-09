@@ -50,7 +50,10 @@ class TestReadMoreSpider:
                     """
                 )
                 response = HtmlResponse(
-                    url=url_default, body=body, encoding="utf-8"
+                    url=url_default,
+                    body=body,
+                    encoding="utf-8",
+                    headers={"Content-Type": "text/html; charset=utf-8"},
                 )
                 spider = make_spider()
                 results = list(spider.parse(response))
@@ -71,7 +74,10 @@ class TestReadMoreSpider:
                     """
                 )
                 response = HtmlResponse(
-                    url=url_default, body=body, encoding="utf-8"
+                    url=url_default,
+                    body=body,
+                    encoding="utf-8",
+                    headers={"Content-Type": "text/html; charset=utf-8"},
                 )
                 spider = make_spider(read_more="次へ")
                 results = list(spider.parse(response))
@@ -93,7 +99,10 @@ class TestReadMoreSpider:
                     """
                 )
                 response = HtmlResponse(
-                    url=url_default, body=body, encoding="utf-8"
+                    url=url_default,
+                    body=body,
+                    encoding="utf-8",
+                    headers={"Content-Type": "text/html; charset=utf-8"},
                 )
                 spider = make_spider(read_more="次へ")
                 spy = mocker.spy(spider, "parse_article")
@@ -116,7 +125,10 @@ class TestReadMoreSpider:
                     """
                 )
                 response = HtmlResponse(
-                    url=url_default, body=body, encoding="utf-8"
+                    url=url_default,
+                    body=body,
+                    encoding="utf-8",
+                    headers={"Content-Type": "text/html; charset=utf-8"},
                 )
                 spider = make_spider(
                     read_more_xpath="//div[@class='special-link']/a"
@@ -141,7 +153,10 @@ class TestReadMoreSpider:
                     """
                 )
                 response = HtmlResponse(
-                    url=url_default, body=body, encoding="utf-8"
+                    url=url_default,
+                    body=body,
+                    encoding="utf-8",
+                    headers={"Content-Type": "text/html; charset=utf-8"},
                 )
                 spider = make_spider(
                     read_more="記事全文を読む",
@@ -164,7 +179,10 @@ class TestReadMoreSpider:
                     """
                 )
                 response = HtmlResponse(
-                    url=url_default, body=body, encoding="utf-8"
+                    url=url_default,
+                    body=body,
+                    encoding="utf-8",
+                    headers={"Content-Type": "text/html; charset=utf-8"},
                 )
                 spider = make_spider(read_next_contains="次へ")
                 results = list(spider.parse(response))
@@ -193,7 +211,10 @@ class TestReadMoreSpider:
                     """
                 )
                 response = HtmlResponse(
-                    url=url_default, body=body, encoding="utf-8"
+                    url=url_default,
+                    body=body,
+                    encoding="utf-8",
+                    headers={"Content-Type": "text/html; charset=utf-8"},
                 )
                 inner_item = ArticleItem(
                     url=url_default,

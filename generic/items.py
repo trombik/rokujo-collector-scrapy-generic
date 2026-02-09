@@ -112,6 +112,16 @@ class ArticleItem:
         Returns:
             Self: An instance of ArticleItem or its subclass.
         """
+        content_type = (
+            res.headers.get("Content-Type", b"")
+            .decode("utf-8")
+            .lower()
+            .strip()
+        )
+        if "text/html" not in content_type:
+            raise ValueError(
+                f"Response is non-HTML content: {res.url} ({content_type})"
+            )
 
         acquired_time = datetime.now(timezone.utc).isoformat()
         metadata = get_metadata(res)

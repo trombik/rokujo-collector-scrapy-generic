@@ -11,4 +11,5 @@ It includes pre-configured spiders, pipelines, and settings to streamline the da
 introduction
 getting_started
 spiders
+rss_reader
 apidocs/index

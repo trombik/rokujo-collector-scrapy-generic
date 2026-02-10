@@ -151,7 +151,7 @@ class FeedSpider(GenericSpider[FeedSpiderConfig]):
             urls=[], feed_config=raw_data.get("feed_config", {}), config=path
         )
 
-    def start_requests(self):
+    async def start(self):
         for url, cfg in self.args.feed_config.items():
             yield scrapy.Request(
                 url,

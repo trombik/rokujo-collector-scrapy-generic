@@ -29,6 +29,13 @@ class GenericSitemapSpider(
     """
     A spider that scrapes all the articles within a sitemap.xml. The
     sitemap.xml may contain another sitemap.xml (nested sitemap.xml).
+
+    The spider crawls almost entire sites and suitable for relatively small
+    sites. In addition, scraped ArticleItem would contains noises. If you
+    prefer quality over quantity, use other focused spiders.
+
+    When urls argument includes a URL that does not end with "sitemap.xml",
+    the spider appends "sitemap.xml" to the URL.
     """
 
     name = "sitemap"
@@ -44,9 +51,13 @@ class GenericSitemapSpider(
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.sitemap_urls = [
-            urljoin(idn2ascii(url), "sitemap.xml") for url in self.args.urls
-        ]
+        for raw_url in self.args.urls:
+            url = idn2ascii(raw_url)
+            if not url.lower().endswith("sitemap.xml"):
+                self.sitemap_urls.append(urljoin(url, "sitemap.xml"))
+            else:
+                self.sitemap_urls.append(url)
+
         self.allowed_domains = [
             urlparse(url).netloc for url in self.sitemap_urls
         ]

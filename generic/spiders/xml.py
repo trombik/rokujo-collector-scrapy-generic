@@ -7,11 +7,13 @@ from generic.spiders.base import GenericSpider, GenericSpiderConfig
 
 
 class XmlSpiderConfig(GenericSpiderConfig):
+    """
+    A configuration class for XmlSpider.
+    """
     xml_link_xpath: str
     """
     XPath expression to extract URLs, e.g., "//link/text()".
     """
-    pass
 
 
 class XmlSpider(
@@ -24,6 +26,9 @@ class XmlSpider(
     """
 
     name = "xml"
+    """
+    The human-friendly name of the spider.
+    """
 
     @classmethod
     def get_config_class(cls) -> Type[XmlSpiderConfig]:
@@ -36,6 +41,9 @@ class XmlSpider(
         super().__init__(*args, **kwargs)
 
     async def start(self):
+        """
+        The entry point. Start crawling from the given URLs.
+        """
         for url in self.args.urls:
             yield scrapy.Request(url, self.parse_xml)
 

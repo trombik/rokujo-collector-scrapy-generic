@@ -23,6 +23,7 @@ jobs:
         runs_on:
           - ubuntu-latest
           - windows-latest
+          - macos-latest
 
     steps:
       - name: Checkout code

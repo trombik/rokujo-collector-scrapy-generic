@@ -44,7 +44,7 @@ class FeedStoragePipeline:
     Save FeedItem on local disk.
     """
 
-    def process_item(self, item, spider):
+    def process_item(self, item):
         if not isinstance(item, FeedItem):
             return item
 
@@ -56,7 +56,6 @@ class FeedStoragePipeline:
                 try:
                     file_path = Path(file_name).resolve()
                     file_path.write_text(content, encoding="utf-8")
-                    spider.logger.info(f"Saved: {file_path}")
                 except Exception as e:
                     raise DropItem(
                         f"failed to save file at: {file_path}\n{e}\n"

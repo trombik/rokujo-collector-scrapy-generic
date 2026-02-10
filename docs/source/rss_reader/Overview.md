@@ -6,6 +6,8 @@ When feeds have new entries, it crawls the new entries and save the collected Ar
 ## Usage
 
 ```console
+uv run bin/rss_reader.py --help
+
 usage: rss_reader.py [-h] [-c CONFIG] [-i INTERVAL] [-d DATABASE] [-o OUTPUT] [-l {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
 
 Simple RSS reader for rokujo-collector-scrapy

@@ -107,7 +107,7 @@ class ArticleItem:
         Args:
             res: scrapy.http.Response.
             lang: The language of the Response. When None, the language is
-                guessed from the content.
+            guessed from the content.
 
         Returns:
             Self: An instance of ArticleItem or its subclass.

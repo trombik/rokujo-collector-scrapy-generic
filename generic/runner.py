@@ -34,18 +34,19 @@ class SpiderRunner:
 
         An example:
 
-        ```python
-        from generic.runner import SpiderRunner, SpiderRunnerConfig
+        .. code-block:: python
 
-        spider = "read-more"
-        args = {
-            "urls": "https://..."
-        }
-        config = SpiderRunnerConfig(spider=spider, args=args)
-        runner = SpiderRunner(config)
-        runner.run()
-        ```
+            from generic.runner import SpiderRunner, SpiderRunnerConfig
 
+            spider = "read-more"
+            args = {
+                "urls": "https://..."
+            }
+            config = SpiderRunnerConfig(spider=spider, args=args)
+            runner = SpiderRunner(config)
+            runner.run()
+
+        docutils sucks.
         """
         # load project settings and apply them to the loader
         settings = get_project_settings()

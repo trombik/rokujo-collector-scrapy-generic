@@ -42,8 +42,29 @@ class FileItem(scrapy.Item):
 @dataclass
 class ArticleItem:
     """
-    Represents an article. An article may have a list of articles.
-    """
+    Represents an article. A JSON representation of an ArticleItem looks like
+    the following:
+
+    .. code-block:: json
+
+        {
+          "acquired_time": "2026-01-29T03:18:20.300844+00:00",
+          "body": "<main> ... </main>",
+          "url": "https://example.org/articles/d74c1662a8cd4ba0146d7f334c3058685320f611",
+          "lang": "ja",
+          "author": "Someone",
+          "description": "A description ... ",
+          "kind": "article",
+          "modified_time": "2026-01-29T11:05:09+09:00",
+          "published_time": "2026-01-29T11:05:09+09:00",
+          "site_name": "Foo website",
+          "title": "A title ...",
+          "item_type": "ArticleItem",
+          "character_count": 42,
+          "sources": []
+        }
+
+    """  # noqa E501
 
     acquired_time: datetime
     """ The time when the webpage was acquired. """
@@ -107,7 +128,7 @@ class ArticleItem:
         Args:
             res: scrapy.http.Response.
             lang: The language of the Response. When None, the language is
-                guessed from the content.
+            guessed from the content.
 
         Returns:
             Self: An instance of ArticleItem or its subclass.

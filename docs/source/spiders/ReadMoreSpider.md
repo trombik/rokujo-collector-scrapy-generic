@@ -16,18 +16,10 @@ uv run scrapy crawl -a'urls=https://example.org/pickup/6567310' -O foo.jsonl rea
 
 The above command will crawl the URL, skip the landing page, crawl all the pages of an article, and generate a JSONL file.
 
-The human-friendly name of the spider is `read-more`. `urls` is a mandatory argument, a comma-separated list of URLs. `-O` option tells the spider to create, or overwrite, a JSONL file and store the collected `ArticleItem` in it. To append new article to the JSONL later, use `-o foo.jsonl`, which appends `ArticleItem` instead of overwriting the file.
-
 To see the result in the file, open it with a text editor, or use [jq](https://jqlang.org/).
 
 ```console
 jq < foo.jsonl
-```
-
-`-O` and `-o` options support other formats, such as `.csv`.
-
-```console
-uv run scrapy crawl -a'urls=https://example.org/pickup/6567310' -O foo.csv read-more
 ```
 
 ## How It Works

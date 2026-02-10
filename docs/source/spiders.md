@@ -8,6 +8,42 @@ Spiders collects some kind of data. Either [ArticleItem](generic.items.ArticleIt
 `ArticleItem` is a structured data such as text and metadata.
 `ArticleItem` has many attributes, including `body`, which is the scraped text from pages, and metadata, such as title of the article page.
 
+```json
+{
+  "acquired_time": "2026-01-29T03:18:20.300844+00:00",
+  "body": "<main> ... </main>",
+  "url": "https://example.org/articles/d74c1662a8cd4ba0146d7f334c3058685320f611",
+  "lang": "ja",
+  "author": "Someone",
+  "description": "A description ... ",
+  "kind": "article",
+  "modified_time": "2026-01-29T11:05:09+09:00",
+  "published_time": "2026-01-29T11:05:09+09:00",
+  "site_name": "Foo website",
+  "title": "A title ...",
+  "item_type": "ArticleItem",
+  "character_count": 42,
+  "sources": []
+}
+```
+
+There are several spiders for different purposes.
+They are different in two points:
+
+* What they collect
+* How they collect the data
+
+Most spiders collect `ArticleItem`, a text article from web pages.
+Others collect files, such as PDF files.
+For example:
+
+* `read-more` spider collects an article of pages, ignoring a landing page commonly found in news websites.
+* `directory` spiders collects `ArticleItem` but only scrapes text of pages under a specific URL path.
+* `sitemap` spiders collects `ArticleItem` by following links in `sitemap.xml`.
+* `file-download` spider collects files linked in web pages, such as PDF files.
+
+The collected data, or items, are passed to item pipelines for further processing and the items are eventually saved, usually in JSONL format.
+The result is a structured JSONL file that can be fed into a database.
 The spiders reside under `generic/spiders`.
 
 ```{toctree}
@@ -17,6 +53,7 @@ The spiders reside under `generic/spiders`.
 spiders/ReadMoreSpider
 spiders/ArchiveSpider
 spiders/FeedSpider
+spiders/XmlSpider
 ```
 
 ## Name
@@ -41,7 +78,14 @@ class ReadMoreSpider(GenericSpider[ReadMoreSpiderConfig], ReadMoreMixin):
 `scrapy list` command displays a list of all available spiders.
 
 ```console
-uv run scrapy list
+> uv run scrapy list
+directory
+feed
+file-download
+read-more
+sitemap
+...
+
 ```
 
 ## Arguments
@@ -75,7 +119,7 @@ uv run scrapy crawl -a "urls=http://example.net/" -a "arg=value2" read-more
 
 ## Output options
 
-Spiders that collects `ArticleItem` can export the items in various format.
+Spiders that collect `ArticleItem` can export the items in various format.
 JSONL is the most recommended one.
 `-O` and `-o` option specify the output file name and the format.
 `-O` overwrites the specified file with the collected items while `-o` appends new items to the file.

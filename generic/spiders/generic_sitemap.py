@@ -40,6 +40,7 @@ class GenericSitemapSpider(
 
     name = "sitemap"
     custom_settings = {}
+    sitemap_urls = []
 
     @classmethod
     def get_config_class(cls) -> Type[GenericSitemapSpiderConfig]:

@@ -21,3 +21,6 @@ wheels/
 !/docs/source/index.rst
 !/docs/source/**/*.md
 !/docs/source/conf.py
+
+/conf/
+/outputs/

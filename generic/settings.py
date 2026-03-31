@@ -68,9 +68,13 @@ DOWNLOAD_HANDLERS = {
 
 ITEM_PIPELINES = {
     "generic.pipelines.DropMissingTextPipeline": 100,
+    "generic.pipelines.SpacyTokenizePipeline": 120,
     "generic.pipelines.FileItemPipeline": 200,
     "generic.pipelines.FileItemStoragePipeline": 900,
 }
+# use the same number of rokujo-analyzer threads
+CONCURRENT_ITEMS = 2
+SPACY_API_URL = "http://127.0.0.1:8000/analyze_tokens"
 #    "generic.pipelines.GenericPipeline": 300,
 # }
 

@@ -3,7 +3,7 @@ from urllib.parse import urlparse, urlunparse
 
 import backoff
 import extruct
-import requests
+import httpx
 from dateutil import parser
 from scrapy.http import Response
 
@@ -265,27 +265,21 @@ def get_url_without_fragment(url_string: str) -> str:
 
 @backoff.on_exception(
     backoff.expo,
-    (requests.exceptions.RequestException, requests.exceptions.Timeout),
+    (httpx.RequestError, httpx.HTTPStatusError, httpx.TimeoutException),
     max_tries=5,
     max_value=30,
-    giveup=lambda e: e.response is not None and e.response.status_code < 500
+    giveup=lambda e: isinstance(e, httpx.HTTPStatusError)
+    and e.response.status_code < 500,
 )
-def analyze_text_with_spacy(text, url="http://127.0.0.1:8000/analyze_tokens"):
-    """
-    Returns analyzed tokens.
-    """
+async def analyze_text_with_spacy(
+    client: httpx.AsyncClient, text: str, url: str
+):
     if not text or not text.strip():
         return []
 
     payload = {"text": text}
+    response = await client.post(url, json=payload, timeout=10.0)
+    response.raise_for_status()
 
-    try:
-        response = requests.post(url, json=payload, timeout=10)
-        response.raise_for_status()
-
-        data = response.json()
-        return data.get("tokens", [])
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error connecting to spaCy service: {e}")
-        return []
+    data = response.json()
+    return data.get("tokens", [])

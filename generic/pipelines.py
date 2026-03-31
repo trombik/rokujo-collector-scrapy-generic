@@ -10,12 +10,14 @@
 import io
 from pathlib import Path
 
+import httpx
 import pikepdf
 import scrapy
 from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
 
 from generic.items import ArticleItem, FeedItem, FileItem
+from generic.utils import analyze_text_with_spacy
 
 
 class GenericPipeline:
@@ -225,3 +227,36 @@ class FileItemStoragePipeline:
                 f"filename: {adapter.get('filename')}\n"
                 f"output_dir: {adapter.get('output_dir')}\n"
             )
+
+
+class SpacyTokenizePipeline:
+    def __init__(self, spacy_url):
+        self.spacy_url = spacy_url
+        self.client = httpx.AsyncClient(timeout=30.0)
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(spacy_url=crawler.settings.get("SPACY_API_URL"))
+
+    async def process_item(self, item, spider):
+        if (
+            not isinstance(item, ArticleItem)
+            or not item.sentences
+            or item.lang != "ja"
+        ):
+            return item
+
+        item.tokens = []
+        for sentence in item.sentences:
+            try:
+                tokens = await analyze_text_with_spacy(
+                    self.client, sentence, self.spacy_url
+                )
+                item.tokens.append(tokens)
+            except Exception as e:
+                raise DropItem(f"Final failure after retries: {e}")
+
+        return item
+
+    async def close_spider(self, spider):
+        await self.client.aclose()

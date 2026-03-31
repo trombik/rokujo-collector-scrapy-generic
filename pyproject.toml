@@ -9,6 +9,7 @@ dependencies = [
     "curl-cffi>=0.16.2",
     "extruct>=0.18.0",
     "feedgen>=1.0.0",
+    "httpx>=0.28.1",
     "ja-sentence-segmenter>=0.0.2",
     "pathvalidate>=3.3.1",
     "pikepdf>=10.2.0",

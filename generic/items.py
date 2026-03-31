@@ -15,7 +15,6 @@ from trafilatura import extract
 from uuid6 import uuid7
 
 from generic.utils import (
-    analyze_text_with_spacy,
     count_xml_character,
     get_metadata,
 )
@@ -184,17 +183,12 @@ class ArticleItem:
         character_count = count_xml_character(body)
         parser = ArticleTextParser()
         sentences = []
-        tokens = []
         if metadata["lang"] == "ja":
             sentences = parser.parse(body)
-            for sentence in sentences:
-                tokens.append(analyze_text_with_spacy(sentence))
 
-            # when these are empty, the article is not useful
+            # when sentences are empty, the article is not useful
             if not sentences:
                 raise ValueError("Empty sentences")
-            if not tokens:
-                raise ValueError("Empty tokens")
 
         return cls(
             url=metadata["url"],
@@ -210,7 +204,8 @@ class ArticleItem:
             published_time=metadata["published_time"],
             modified_time=metadata["modified_time"],
             sentences=sentences,
-            tokens=tokens,
+            # tokens are filled by SpacyTokenizePipeline
+            tokens=[],
         )
 
 

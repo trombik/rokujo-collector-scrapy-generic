@@ -37,7 +37,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies via apt
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.runs_on == 'ubuntu-latest'
         run: |
           sudo apt install libcurl4-openssl-dev
 

@@ -58,7 +58,7 @@ class ArticleTextParser:
         text = re.sub(r"\[編集\]", "", text)
         text = re.sub(r"\[\d+\]", "", text)
         text = re.sub(r"\[注\s*\d+\]", "", text)
-        text = re.sub(r"ISBN\s*\d+。?$", "", text)
+        text = re.sub(r"ISBN\s*[\d-]+。?$", "", text)
         text = re.sub(r"^\^.*", "", text)
         text = re.sub(r"\n", "", text)
         return text.strip()

@@ -36,7 +36,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      - name: Install dependencies via apt
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt install libcurl4-openssl-dev
+
+      - name: Install dependencies via uv
         # v8
         uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
         with:

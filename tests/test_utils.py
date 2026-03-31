@@ -2,8 +2,10 @@ import os
 from urllib.parse import quote
 
 import pytest
+import requests_mock
 
 from generic.utils import (
+    analyze_text_with_spacy,
     generate_hashed_filename,
     get_url_without_fragment,
     is_file_url,
@@ -174,3 +176,46 @@ class GetUrlWithoutFragment:
 
         assert len(unique_urls) == 1
         assert list(unique_urls)[0] == "https://example.org/article/1"
+
+
+class AnalyzeTextWithSpacy:
+    def test_analyze_text_with_spacy_success():
+        url = "http://127.0.0.1:8000/analyze_tokens"
+        mock_response = {
+            "tokens": [
+                {"text": "Apple", "pos": "PROPN", "dep": "nsubj"},
+                {"text": "is", "pos": "AUX", "dep": "cop"},
+                {"text": "red", "pos": "ADJ", "dep": "root"}
+            ]
+        }
+
+        with requests_mock.Mocker() as m:
+            m.post(url, json=mock_response, status_code=200)
+
+            result = analyze_text_with_spacy("Apple is red")
+
+            assert len(result) == 3
+            assert result[0]["text"] == "Apple"
+            assert result[2]["pos"] == "ADJ"
+
+    def test_analyze_text_with_spacy_empty_input():
+        assert analyze_text_with_spacy("") == []
+        assert analyze_text_with_spacy(None) == []
+
+    def test_analyze_text_with_spacy_server_error():
+        url = "http://127.0.0.1:8000/analyze_tokens"
+
+        with requests_mock.Mocker() as m:
+            m.post(url, status_code=500)
+
+            result = analyze_text_with_spacy("test")
+            assert result == []
+
+    def test_analyze_text_with_spacy_timeout():
+        url = "http://127.0.0.1:8000/analyze_tokens"
+
+        with requests_mock.Mocker() as m:
+            m.post(url, exc=pytest.importorskip("requests").exceptions.Timeout)
+
+            result = analyze_text_with_spacy("test")
+            assert result == []

@@ -1,6 +1,9 @@
+import re
 from urllib.parse import urlparse, urlunparse
 
+import backoff
 import extruct
+import requests
 from dateutil import parser
 from scrapy.http import Response
 
@@ -154,7 +157,6 @@ def count_xml_character(xml_string: str) -> int:
     """
     Count characters in XML string, excluding spaces (not words).
     """
-    import re
 
     from scrapy import Selector
 
@@ -259,3 +261,31 @@ def get_url_without_fragment(url_string: str) -> str:
     """
     parsed = urlparse(url_string)
     return urlunparse(parsed._replace(fragment=""))
+
+
+@backoff.on_exception(
+    backoff.expo,
+    (requests.exceptions.RequestException, requests.exceptions.Timeout),
+    max_tries=5,
+    max_value=30,
+    giveup=lambda e: e.response is not None and e.response.status_code < 500
+)
+def analyze_text_with_spacy(text, url="http://127.0.0.1:8000/analyze_tokens"):
+    """
+    Returns analyzed tokens.
+    """
+    if not text or not text.strip():
+        return []
+
+    payload = {"text": text}
+
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        response.raise_for_status()
+
+        data = response.json()
+        return data.get("tokens", [])
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error connecting to spaCy service: {e}")
+        return []

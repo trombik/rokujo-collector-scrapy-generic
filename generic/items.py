@@ -12,8 +12,14 @@ import scrapy
 from scrapy.http import Response
 from scrapy.selector import Selector
 from trafilatura import extract
+from uuid6 import uuid7
 
-from generic.utils import count_xml_character, get_metadata
+from generic.utils import (
+    analyze_text_with_spacy,
+    count_xml_character,
+    get_metadata,
+)
+from generic.utils.text_parser import ArticleTextParser
 
 
 class FileItem(scrapy.Item):
@@ -101,6 +107,12 @@ class ArticleItem:
     """ The number of characters in the article."""
     sources: List[Self] = field(default_factory=list)
     """ A list of sources. """
+    sentences: List[str] = field(default_factory=list)
+    """ Sentences """
+    tokens: List[str] = field(default_factory=list)
+    """ Tokens """
+    uuid: str = field(default_factory=lambda: str(uuid7()))
+    """ UUID of the article """
 
     def __post_init__(self):
         self.item_type = self.__class__.__name__
@@ -170,6 +182,19 @@ class ArticleItem:
                 )
             )
         character_count = count_xml_character(body)
+        parser = ArticleTextParser()
+        sentences = []
+        tokens = []
+        if metadata["lang"] == "ja":
+            sentences = parser.parse(body)
+            for sentence in sentences:
+                tokens.append(analyze_text_with_spacy(sentence))
+
+            # when these are empty, the article is not useful
+            if not sentences:
+                raise ValueError("Empty sentences")
+            if not tokens:
+                raise ValueError("Empty tokens")
 
         return cls(
             url=metadata["url"],
@@ -184,6 +209,8 @@ class ArticleItem:
             acquired_time=acquired_time,
             published_time=metadata["published_time"],
             modified_time=metadata["modified_time"],
+            sentences=sentences,
+            tokens=tokens,
         )
 
 

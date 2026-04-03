@@ -283,3 +283,17 @@ async def analyze_text_with_spacy(
 
     data = response.json()
     return data.get("tokens", [])
+
+
+def tokens_include_predicate(tokens):
+    if any(t.get("dep") == "nsubj" for t in tokens):
+        return True
+
+    root_token = next((t for t in tokens if t.get("dep") == "ROOT"), None)
+    if root_token and root_token.get("pos") in ["VERB", "ADJ", "AUX"]:
+        return True
+
+    if any(t.get("tag", "").startswith(("動詞", "形容詞")) for t in tokens):
+        return True
+
+    return False

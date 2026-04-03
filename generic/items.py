@@ -18,7 +18,6 @@ from generic.utils import (
     count_xml_character,
     get_metadata,
 )
-from generic.utils.text_parser import ArticleTextParser
 
 
 class FileItem(scrapy.Item):
@@ -181,14 +180,6 @@ class ArticleItem:
                 )
             )
         character_count = count_xml_character(body)
-        parser = ArticleTextParser()
-        sentences = []
-        if metadata["lang"] == "ja":
-            sentences = parser.parse(body)
-
-            # when sentences are empty, the article is not useful
-            if not sentences:
-                raise ValueError("Empty sentences")
 
         return cls(
             url=metadata["url"],
@@ -203,7 +194,7 @@ class ArticleItem:
             acquired_time=acquired_time,
             published_time=metadata["published_time"],
             modified_time=metadata["modified_time"],
-            sentences=sentences,
+            sentences=[],
             # tokens are filled by SpacyTokenizePipeline
             tokens=[],
         )

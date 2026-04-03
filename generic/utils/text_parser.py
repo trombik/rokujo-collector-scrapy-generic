@@ -10,9 +10,6 @@ from lxml import html
 
 
 class ArticleTextParser:
-    def __init__(self):
-        self.heading_min_length = 5
-
     def parse(self, html_string):
         if not html_string:
             return []
@@ -32,17 +29,23 @@ class ArticleTextParser:
             # text not enclosed by tags
             if isinstance(node, html.HtmlElement) is False:
                 text = self._clean(str(node))
-                if len(text) > self.heading_min_length:
-                    sentences.append(text)
+                sentences.append(text)
                 continue
 
             if node.tag in ["p", "head"]:
                 block_text = self._clean(node.text_content())
+                print(node.text_content())
                 if block_text:
                     segmented = self.segment(block_text)
                     sentences.extend(
                         [s.strip() for s in segmented if s.strip()]
                     )
+
+            elif node.tag in ["list"]:
+                for item in node.xpath(".//item"):
+                    item_text = item.text_content()
+                    if item.text is not None:
+                        sentences.extend(self.segment(item_text))
 
             else:
                 inner_text = self._clean(node.text_content())
@@ -57,9 +60,8 @@ class ArticleTextParser:
     def _clean(self, text):
         text = re.sub(r"\[編集\]", "", text)
         text = re.sub(r"\[\d+\]", "", text)
-        text = re.sub(r"\[注\s*\d+\]", "", text)
-        text = re.sub(r"ISBN\s*\d+。?$", "", text)
-        text = re.sub(r"^\^.*", "", text)
+        text = re.sub(r"\[注釈?\s*\d+\]", "", text)
+        text = re.sub(r"ISBN\s*[\d-]+。?$", "", text)
         text = re.sub(r"\n", "", text)
         return text.strip()
 
@@ -67,7 +69,7 @@ class ArticleTextParser:
         parent = el.getparent()
         if el.tail is not None and el.tail.strip():
             prev = el.getprevious()
-            if prev:
+            if prev is not None:
                 prev.tail = (prev.tail or "") + el.tail
             else:
                 parent.text = (parent.text or "") + el.tail

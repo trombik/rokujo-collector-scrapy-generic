@@ -34,7 +34,6 @@ class ArticleTextParser:
 
             if node.tag in ["p", "head"]:
                 block_text = self._clean(node.text_content())
-                print(node.text_content())
                 if block_text:
                     segmented = self.segment(block_text)
                     sentences.extend(

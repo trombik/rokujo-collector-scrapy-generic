@@ -8,6 +8,7 @@
 
 
 import io
+import re
 from pathlib import Path
 
 import httpx
@@ -17,7 +18,8 @@ from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
 
 from generic.items import ArticleItem, FeedItem, FileItem
-from generic.utils import analyze_text_with_spacy
+from generic.utils import analyze_text_with_spacy, tokens_include_predicate
+from generic.utils.text_parser import ArticleTextParser
 
 
 class GenericPipeline:
@@ -239,12 +241,15 @@ class SpacyTokenizePipeline:
         return cls(spacy_url=crawler.settings.get("SPACY_API_URL"))
 
     async def process_item(self, item, spider):
-        if (
-            not isinstance(item, ArticleItem)
-            or not item.sentences
-            or item.lang != "ja"
-        ):
+        if not isinstance(item, ArticleItem) or item.lang != "ja":
             return item
+
+        parser = ArticleTextParser()
+        item.sentences = parser.parse(item.body)
+
+        # when sentences are empty, the article is not useful
+        if not item.sentences:
+            raise DropItem("Empty sentences")
 
         item.tokens = []
         for sentence in item.sentences:
@@ -260,3 +265,23 @@ class SpacyTokenizePipeline:
 
     async def close_spider(self, spider):
         await self.client.aclose()
+
+
+class CleanSentencesPipeline:
+    async def process_item(self, item, spider):
+        new_tokens = []
+        new_sentences = []
+        for index, tokens in enumerate(item.tokens, 0):
+            if tokens_include_predicate(tokens) is False:
+                continue
+            if len(tokens) < 8:
+                continue
+            if re.match(r"^\^", item.sentences[index]):
+                # ignore Wikipedia's source list items
+                continue
+            new_sentences.append(item.sentences[index])
+            new_tokens.append(item.tokens[index])
+
+        item.tokens = new_tokens
+        item.sentences = new_sentences
+        return item

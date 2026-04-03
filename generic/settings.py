@@ -69,6 +69,7 @@ DOWNLOAD_HANDLERS = {
 ITEM_PIPELINES = {
     "generic.pipelines.DropMissingTextPipeline": 100,
     "generic.pipelines.SpacyTokenizePipeline": 120,
+    "generic.pipelines.CleanSentencesPipeline": 130,
     "generic.pipelines.FileItemPipeline": 200,
     "generic.pipelines.FileItemStoragePipeline": 900,
 }
